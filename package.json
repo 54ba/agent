@@ -1,0 +1,23 @@
+{
+  "name": "ai-task",
+  "version": "1.0.0",
+  "description": "A modern, scalable API for processing PDF documents using FastAPI, LangChain, and advanced NLP capabilities. This project provides both a REST API and a beautiful CLI interface for PDF processing tasks.",
+  "main": "cypress.config.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "test": "cypress run",
+    "test:watch": "cypress open"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.6.6",
+    "cypress-file-upload": "^5.0.8"
+  }
+}

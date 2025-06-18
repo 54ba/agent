@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - UPLOAD_DIR=uploads
+      - MAX_UPLOAD_SIZE=10485760
+    restart: unless-stopped

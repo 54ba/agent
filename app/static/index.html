@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Processing API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="file"] {
+            display: block;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Processing</h1>
+
+        <div class="form-group">
+            <h2>Upload and Process PDF</h2>
+            <form id="uploadForm">
+                <label for="uploadFile">Select PDF file:</label>
+                <input type="file" id="uploadFile" accept=".pdf" required>
+                <button type="submit">Upload and Process</button>
+            </form>
+        </div>
+
+        <div class="form-group">
+            <h2>Extract Text from PDF</h2>
+            <form id="extractForm">
+                <label for="extractFile">Select PDF file:</label>
+                <input type="file" id="extractFile" accept=".pdf" required>
+                <button type="submit">Extract Text</button>
+            </form>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const resultDiv = document.getElementById('result');
+
+        // Upload and Process PDF
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('uploadFile').files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/pdf/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                showResult('Upload and Process Result:', data);
+            } catch (error) {
+                showResult('Error:', error.message);
+            }
+        });
+
+        // Extract Text from PDF
+        document.getElementById('extractForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = document.getElementById('extractFile').files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/api/pdf/extract-text', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                showResult('Extracted Text:', data);
+            } catch (error) {
+                showResult('Error:', error.message);
+            }
+        });
+
+        function showResult(title, data) {
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <h3>${title}</h3>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        }
+    </script>
+</body>
+</html>
