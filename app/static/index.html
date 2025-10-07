@@ -3,127 +3,1213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Processing API</title>
+    <title>✈️ Air Travel Price Comparison</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
         }
+
         .container {
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 5px;
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 40px;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
         .form-group {
-            margin-bottom: 15px;
+            position: relative;
         }
-        label {
+
+        .form-group label {
             display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group i {
+            position: absolute;
+            right: 15px;
+            top: 45px;
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .search-btn {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            padding: 0 40px 40px;
+        }
+
+        .search-history {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .search-history h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .history-item {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .history-item:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .ai-insights {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .ai-insights h3 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .insights-content {
+            display: grid;
+            gap: 15px;
+        }
+
+        .insight-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .insight-item h4 {
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .insight-item ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .insight-item li {
             margin-bottom: 5px;
         }
-        input[type="file"] {
-            display: block;
+
+        .ai-features {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .ai-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .ai-btn:active {
+            transform: translateY(0);
+        }
+
+        .ai-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .ai-response {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .confidence-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .confidence-high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .confidence-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .confidence-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .result-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .result-action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .result-action-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+
+        .search-suggestions {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            background: #f8f9fa;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .results-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        .price-comparison {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .best-price {
+            font-size: 3em;
+            font-weight: bold;
             margin-bottom: 10px;
         }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+
+        .best-currency {
+            font-size: 1.2em;
+            opacity: 0.9;
         }
-        button:hover {
-            background-color: #45a049;
+
+        .all-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
         }
-        #result {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+
+        .result-card {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .result-card.best {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            transform: scale(1.02);
+        }
+
+        .result-card.preferred {
+            border-color: #e74c3c;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+        }
+
+        .result-card .currency {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .result-card .price {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .result-card .usd-equivalent {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .error {
             display: none;
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 40px;
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .search-section {
+                padding: 20px;
+            }
+
+            .results {
+                padding: 0 20px 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>PDF Processing</h1>
-
-        <div class="form-group">
-            <h2>Upload and Process PDF</h2>
-            <form id="uploadForm">
-                <label for="uploadFile">Select PDF file:</label>
-                <input type="file" id="uploadFile" accept=".pdf" required>
-                <button type="submit">Upload and Process</button>
-            </form>
+        <div class="header">
+            <h1><i class="fas fa-plane"></i> Flight Price Comparison</h1>
+            <p>Find the best airfare deals across multiple currencies</p>
         </div>
 
-        <div class="form-group">
-            <h2>Extract Text from PDF</h2>
-            <form id="extractForm">
-                <label for="extractFile">Select PDF file:</label>
-                <input type="file" id="extractFile" accept=".pdf" required>
-                <button type="submit">Extract Text</button>
-            </form>
-        </div>
+        <div class="search-section">
+            <!-- Natural Language Search -->
+            <div class="ai-search" style="margin-bottom: 30px; text-align: center;">
+                <h3 style="color: white; margin-bottom: 15px;"><i class="fas fa-microphone"></i> Ask AI to Plan Your Trip</h3>
+                <div style="display: flex; gap: 10px; max-width: 600px; margin: 0 auto;">
+                    <input type="text" id="naturalLanguageQuery" placeholder="Try: 'Find cheap flights from New York to London next month'"
+                           style="flex: 1; padding: 15px; border: none; border-radius: 25px; font-size: 16px;">
+                    <button type="button" id="aiSearchBtn" style="padding: 15px 25px; background: #667eea; color: white; border: none; border-radius: 25px; cursor: pointer;">
+                        <i class="fas fa-search"></i> Ask AI
+                    </button>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="fillExampleQuery('Find cheap flights from New York to London next month')">
+                        <i class="fas fa-plane"></i> NYC → LON
+                    </button>
+                    <button class="quick-action-btn" onclick="fillExampleQuery('Book 2 tickets to Paris in June')">
+                        <i class="fas fa-euro-sign"></i> Paris Trip
+                    </button>
+                    <button class="quick-action-btn" onclick="fillExampleQuery('Find flights to Tokyo under $800')">
+                        <i class="fas fa-yen-sign"></i> Tokyo Deal
+                    </button>
+                </div>
+                <div class="search-suggestions" id="searchSuggestions"></div>
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.9em; margin-top: 10px;">
+                    Describe your travel plans in plain English and let AI find the best options for you!
+                </p>
+            </div>
 
-        <div id="result"></div>
+            <form id="searchForm" class="search-form">
+                <div class="form-group">
+                    <label for="origin"><i class="fas fa-plane-departure"></i> From</label>
+                    <input type="text" id="origin" placeholder="JFK" maxlength="3" required>
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+
+                <div class="form-group">
+                    <label for="destination"><i class="fas fa-plane-arrival"></i> To</label>
+                    <input type="text" id="destination" placeholder="LAX" maxlength="3" required>
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+
+                <div class="form-group">
+                    <label for="departureDate"><i class="fas fa-calendar-alt"></i> Departure Date</label>
+                    <input type="date" id="departureDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="passengers"><i class="fas fa-users"></i> Passengers</label>
+                    <select id="passengers">
+                        <option value="1">1 Adult</option>
+                        <option value="2">2 Adults</option>
+                        <option value="3">3 Adults</option>
+                        <option value="4">4 Adults</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="preferredCurrency"><i class="fas fa-dollar-sign"></i> Preferred Currency</label>
+                    <select id="preferredCurrency">
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                        <option value="CAD">CAD (C$)</option>
+                        <option value="AUD">AUD (A$)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i>
+                    Compare Prices
+                </button>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <h3>Searching for the best deals...</h3>
+                <p>Comparing prices across multiple currencies</p>
+            </div>
+
+            <div class="error" id="error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3 id="errorTitle">Search Error</h3>
+                <p id="errorMessage">Please try again later</p>
+            </div>
+
+            <div class="results" id="results">
+                <div class="results-header">
+                    <h2><i class="fas fa-chart-line"></i> Price Comparison Results</h2>
+                    <p>Prices compared across USD, EUR, GBP, CAD, and AUD</p>
+                </div>
+
+                <div class="price-comparison" id="bestPrice" style="display: none;">
+                    <div class="best-price" id="bestPriceAmount">$0.00</div>
+                    <div class="best-currency" id="bestPriceCurrency">Best price found</div>
+                </div>
+
+                <div class="all-results" id="allResults"></div>
+
+                <div class="result-actions">
+                    <button class="result-action-btn" id="bookBestDeal">
+                        <i class="fas fa-plane"></i> Book Best Deal
+                    </button>
+                    <button class="result-action-btn" id="compareAllOptions">
+                        <i class="fas fa-balance-scale"></i> Compare All
+                    </button>
+                    <button class="result-action-btn" id="saveSearch">
+                        <i class="fas fa-heart"></i> Save Search
+                    </button>
+                </div>
+
+                <div class="ai-insights" id="aiInsights" style="display: none;">
+                    <h3><i class="fas fa-brain"></i> AI Travel Insights</h3>
+                    <div class="insights-content" id="insightsContent"></div>
+                    <div class="ai-features">
+                        <button class="ai-btn" id="getDestinationInsights">
+                            <i class="fas fa-map-marker-alt"></i> Destination Guide
+                        </button>
+                        <button class="ai-btn" id="analyzePrices">
+                            <i class="fas fa-chart-line"></i> Price Analysis
+                        </button>
+                        <button class="ai-btn" id="getTravelTips">
+                            <i class="fas fa-lightbulb"></i> Travel Tips
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="search-history">
+                <h3><i class="fas fa-history"></i> Recent Searches</h3>
+                <div class="history-list" id="historyList"></div>
+            </div>
+        </div>
     </div>
 
     <script>
-        const resultDiv = document.getElementById('result');
+        const searchForm = document.getElementById('searchForm');
+        const searchBtn = document.getElementById('searchBtn');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const results = document.getElementById('results');
+        const bestPrice = document.getElementById('bestPrice');
+        const bestPriceAmount = document.getElementById('bestPriceAmount');
+        const bestPriceCurrency = document.getElementById('bestPriceCurrency');
+        const allResults = document.getElementById('allResults');
+        const errorTitle = document.getElementById('errorTitle');
+        const errorMessage = document.getElementById('errorMessage');
+        const historyList = document.getElementById('historyList');
+        const aiInsights = document.getElementById('aiInsights');
+        const insightsContent = document.getElementById('insightsContent');
 
-        // Upload and Process PDF
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const file = document.getElementById('uploadFile').files[0];
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                const response = await fetch('/api/pdf/upload', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                showResult('Upload and Process Result:', data);
-            } catch (error) {
-                showResult('Error:', error.message);
-            }
-        });
-
-        // Extract Text from PDF
-        document.getElementById('extractForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const file = document.getElementById('extractFile').files[0];
-            if (!file) return;
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                const response = await fetch('/api/pdf/extract-text', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                showResult('Extracted Text:', data);
-            } catch (error) {
-                showResult('Error:', error.message);
-            }
-        });
-
-        function showResult(title, data) {
-            resultDiv.style.display = 'block';
-            resultDiv.innerHTML = `
-                <h3>${title}</h3>
-                <pre>${JSON.stringify(data, null, 2)}</pre>
-            `;
+        // Airport code validation
+        function validateAirportCode(code) {
+            return /^[A-Z]{3}$/.test(code.toUpperCase());
         }
+
+        // Fill example queries
+        function fillExampleQuery(query) {
+            document.getElementById('naturalLanguageQuery').value = query;
+        }
+
+        // Show search suggestions
+        function showSearchSuggestions(query) {
+            const suggestionsDiv = document.getElementById('searchSuggestions');
+            if (query.length < 3) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            const suggestions = [
+                `Find flights from ${query} to`,
+                `Book tickets to ${query}`,
+                `Cheap flights to ${query}`,
+                `${query} travel deals`
+            ];
+
+            suggestionsDiv.innerHTML = suggestions.map(suggestion =>
+                `<div class="suggestion-item" onclick="fillExampleQuery('${suggestion}')">${suggestion}</div>`
+            ).join('');
+
+            suggestionsDiv.style.display = 'block';
+        }
+
+        // Enhanced AI insights display
+        function displayEnhancedAIInsights(insights, type = 'general') {
+            const insightDiv = document.createElement('div');
+            insightDiv.className = 'ai-response';
+
+            let content = '';
+            if (type === 'destination') {
+                content = `
+                    <h4><i class="fas fa-map-marker-alt"></i> Destination Intelligence</h4>
+                    ${insights.best_time_to_visit ? `<p><strong>🌸 Best Time:</strong> ${insights.best_time_to_visit}</p>` : ''}
+                    ${insights.attractions ? `<p><strong>🏛️ Must-See:</strong> ${insights.attractions.join(', ')}</p>` : ''}
+                    ${insights.travel_tips ? `<p><strong>💡 Pro Tips:</strong> ${insights.travel_tips.join(', ')}</p>` : ''}
+                    ${insights.transportation ? `<p><strong>🚇 Getting Around:</strong> ${insights.transportation.join(', ')}</p>` : ''}
+                `;
+            } else if (type === 'analysis') {
+                content = `
+                    <h4><i class="fas fa-chart-line"></i> Smart Price Analysis</h4>
+                    ${insights.best_value_currency ? `<p><strong>💰 Best Currency:</strong> ${insights.best_value_currency}</p>` : ''}
+                    ${insights.trend_analysis ? `<p><strong>📈 Market Trend:</strong> ${insights.trend_analysis}</p>` : ''}
+                    ${insights.booking_recommendation ? `<p><strong>🎯 Recommendation:</strong> ${insights.booking_recommendation}</p>` : ''}
+                `;
+            }
+
+            insightDiv.innerHTML = content;
+            insightsContent.appendChild(insightDiv);
+            aiInsights.style.display = 'block';
+        }
+
+        // Format currency
+        function formatCurrency(amount, currency) {
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currency,
+                minimumFractionDigits: 2
+            });
+            return formatter.format(amount);
+        }
+
+        // Search history management
+        function saveSearch(searchData) {
+            const history = getSearchHistory();
+            const searchKey = `${searchData.origin}-${searchData.destination}-${searchData.departureDate}`;
+
+            // Remove if already exists
+            const filtered = history.filter(item => item.key !== searchKey);
+
+            // Add to beginning
+            filtered.unshift({
+                key: searchKey,
+                ...searchData,
+                timestamp: Date.now()
+            });
+
+            // Keep only last 5
+            const limited = filtered.slice(0, 5);
+            localStorage.setItem('flightSearchHistory', JSON.stringify(limited));
+            updateHistoryDisplay();
+        }
+
+        function getSearchHistory() {
+            const history = localStorage.getItem('flightSearchHistory');
+            return history ? JSON.parse(history) : [];
+        }
+
+        function updateHistoryDisplay() {
+            const history = getSearchHistory();
+            historyList.innerHTML = '';
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<span style="color: #666; font-style: italic;">No recent searches</span>';
+                return;
+            }
+
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.textContent = `${item.origin} → ${item.destination}`;
+                historyItem.onclick = () => loadSearch(item);
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        function loadSearch(searchData) {
+            document.getElementById('origin').value = searchData.origin;
+            document.getElementById('destination').value = searchData.destination;
+            document.getElementById('departureDate').value = searchData.departureDate;
+            document.getElementById('passengers').value = searchData.passengers || 1;
+            document.getElementById('preferredCurrency').value = searchData.preferredCurrency || 'USD';
+        }
+
+        // AI Insights functions
+        async function fetchAIInsights(searchData) {
+            try {
+                const response = await fetch('/api/ai/recommendations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(searchData)
+                });
+
+                if (response.ok) {
+                    const insights = await response.json();
+                    displayAIInsights(insights);
+                }
+            } catch (error) {
+                console.log('AI insights not available:', error);
+            }
+        }
+
+        // Destination Insights
+        async function fetchDestinationInsights(destination) {
+            const btn = document.getElementById('getDestinationInsights');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
+            try {
+                const response = await fetch(`/api/ai/destination-insights/${destination}`);
+                const insights = await response.json();
+
+                if (response.ok) {
+                    displayDestinationInsights(insights, destination);
+                } else {
+                    showError('Destination Insights', 'Unable to load destination information.');
+                }
+            } catch (error) {
+                showError('Destination Insights', 'AI service temporarily unavailable.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Destination Guide';
+            }
+        }
+
+        // Price Analysis
+        async function analyzePrices() {
+            const btn = document.getElementById('analyzePrices');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+            try {
+                // Get current search results for analysis
+                const currentResults = JSON.parse(localStorage.getItem('lastSearchResults') || '[]');
+                if (currentResults.length === 0) {
+                    showError('Price Analysis', 'Please perform a flight search first.');
+                    return;
+                }
+
+                const response = await fetch('/api/ai/analyze-prices', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prices: currentResults })
+                });
+
+                const analysis = await response.json();
+
+                if (response.ok) {
+                    displayPriceAnalysis(analysis);
+                } else {
+                    showError('Price Analysis', 'Unable to analyze price trends.');
+                }
+            } catch (error) {
+                showError('Price Analysis', 'AI analysis service temporarily unavailable.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-chart-line"></i> Price Analysis';
+            }
+        }
+
+        function displayAIInsights(insights) {
+            if (!insights.recommendations || insights.recommendations.length === 0) {
+                return;
+            }
+
+            insightsContent.innerHTML = '';
+
+            // Add recommendations
+            if (insights.recommendations && insights.recommendations.length > 0) {
+                const recDiv = document.createElement('div');
+                recDiv.className = 'insight-item';
+                recDiv.innerHTML = `
+                    <h4><i class="fas fa-lightbulb"></i> Travel Recommendations</h4>
+                    <ul>
+                        ${insights.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                `;
+                insightsContent.appendChild(recDiv);
+            }
+
+            // Add insights
+            if (insights.insights) {
+                const insightDiv = document.createElement('div');
+                insightDiv.className = 'insight-item';
+                insightDiv.innerHTML = `
+                    <h4><i class="fas fa-info-circle"></i> Travel Insights</h4>
+                    <p>${insights.insights}</p>
+                `;
+                insightsContent.appendChild(insightDiv);
+            }
+
+            aiInsights.style.display = 'block';
+        }
+
+        function displayDestinationInsights(insights, destination) {
+            displayEnhancedAIInsights(insights, 'destination');
+        }
+
+        function displayPriceAnalysis(analysis) {
+            displayEnhancedAIInsights(analysis, 'analysis');
+        }
+
+        // Travel Tips function
+        async function getTravelTips() {
+            const btn = document.getElementById('getTravelTips');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Getting Tips...';
+
+            try {
+                const searchData = JSON.parse(localStorage.getItem('lastSearchData') || '{}');
+                const response = await fetch('/api/ai/recommendations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(searchData)
+                });
+
+                const tips = await response.json();
+
+                if (response.ok) {
+                    const tipsDiv = document.createElement('div');
+                    tipsDiv.className = 'ai-response';
+                    tipsDiv.innerHTML = `
+                        <h4><i class="fas fa-lightbulb"></i> Personalized Travel Tips</h4>
+                        ${tips.recommendations ? `<ul>${tips.recommendations.map(tip => `<li>${tip}</li>`).join('')}</ul>` : ''}
+                        ${tips.insights ? `<p><strong>💡 Insight:</strong> ${tips.insights}</p>` : ''}
+                    `;
+
+                    insightsContent.appendChild(tipsDiv);
+                    aiInsights.style.display = 'block';
+                } else {
+                    showError('Tips Unavailable', 'AI travel tips are temporarily unavailable.');
+                }
+            } catch (error) {
+                showError('Tips Error', 'Unable to load travel tips.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-lightbulb"></i> Travel Tips';
+            }
+        }
+
+        // Result action functions
+        function bookBestDeal() {
+            const bestPrice = document.getElementById('bestPriceAmount').textContent;
+            if (bestPrice !== '$0.00') {
+                showError('Booking Service', 'External booking integration would be implemented here. In a real app, this would redirect to a booking platform.', 'success');
+            } else {
+                showError('No Deal Selected', 'Please search for flights first.');
+            }
+        }
+
+        function compareAllOptions() {
+            const results = document.getElementById('allResults');
+            if (results.style.display === 'block') {
+                // Toggle detailed view
+                const cards = results.querySelectorAll('.result-card');
+                cards.forEach(card => {
+                    card.classList.toggle('detailed');
+                });
+            } else {
+                showError('No Results', 'Please search for flights first.');
+            }
+        }
+
+        function saveSearch() {
+            const searchData = JSON.parse(localStorage.getItem('lastSearchData') || '{}');
+            if (searchData.origin) {
+                // In a real app, this would save to user account
+                showError('Search Saved!', 'Your search has been saved to your account.', 'success');
+                setTimeout(() => hideError(), 3000);
+            } else {
+                showError('No Search to Save', 'Please perform a search first.');
+            }
+        }
+
+        // Show loading state
+        function showLoading() {
+            loading.style.display = 'block';
+            error.style.display = 'none';
+            results.style.display = 'none';
+            searchBtn.disabled = true;
+            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            loading.style.display = 'none';
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = '<i class="fas fa-search"></i> Compare Prices';
+        }
+
+        // Show error
+        function showError(title, message, type = 'error') {
+            errorTitle.textContent = title;
+            errorMessage.textContent = message;
+            error.style.background = type === 'success' ? '#d4edda' : '#fee';
+            error.style.borderColor = type === 'success' ? '#c3e6cb' : '#fcc';
+            errorTitle.style.color = type === 'success' ? '#155724' : '#c33';
+            errorMessage.style.color = type === 'success' ? '#155724' : '#c33';
+            error.style.display = 'block';
+            results.style.display = 'none';
+            if (type !== 'success') {
+                hideLoading();
+            }
+        }
+
+        // Hide error
+        function hideError() {
+            error.style.display = 'none';
+        }
+
+        // Show results
+        function showResults(data, preferredCurrency) {
+            if (data.error) {
+                showError('No Flights Found', 'Unable to find flight offers for your search. Please check your airport codes and try different dates.');
+                return;
+            }
+
+            // Show best price
+            bestPriceAmount.textContent = formatCurrency(data.lowest_price, data.lowest_currency);
+            bestPriceCurrency.textContent = `Best price in ${data.lowest_currency}`;
+            bestPrice.style.display = 'block';
+
+            // Sort results with preferred currency first
+            const sortedResults = [...data.all_results].sort((a, b) => {
+                if (a.currency === preferredCurrency && b.currency !== preferredCurrency) return -1;
+                if (b.currency === preferredCurrency && a.currency !== preferredCurrency) return 1;
+                return a.price_usd - b.price_usd; // Then by USD price
+            });
+
+            // Show all results
+            allResults.innerHTML = '';
+            sortedResults.forEach(result => {
+                const isBest = result.currency === data.lowest_currency &&
+                              Math.abs(result.price - data.lowest_price) < 0.01;
+                const isPreferred = result.currency === preferredCurrency;
+
+                const card = document.createElement('div');
+                card.className = `result-card ${isBest ? 'best' : ''} ${isPreferred ? 'preferred' : ''}`;
+                card.innerHTML = `
+                    <div class="currency">${result.currency} ${isPreferred ? '<i class="fas fa-heart" style="color: #e74c3c;"></i>' : ''}</div>
+                    <div class="price">${formatCurrency(result.price, result.currency)}</div>
+                    <div class="usd-equivalent">≈ ${formatCurrency(result.price_usd, 'USD')} USD</div>
+                    ${isBest ? '<div style="color: #667eea; font-weight: bold; margin-top: 10px;"><i class="fas fa-star"></i> Best Deal!</div>' : ''}
+                    ${isPreferred ? '<div style="color: #e74c3c; font-weight: bold; margin-top: 5px;"><i class="fas fa-heart"></i> Your Preferred Currency</div>' : ''}
+                `;
+                allResults.appendChild(card);
+            });
+
+            results.style.display = 'block';
+            error.style.display = 'none';
+            hideLoading();
+        }
+
+        // Input validation
+        document.getElementById('origin').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+            if (this.value.length === 3 && !validateAirportCode(this.value)) {
+                this.setCustomValidity('Please enter a valid 3-letter airport code');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        document.getElementById('destination').addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+            if (this.value.length === 3 && !validateAirportCode(this.value)) {
+                this.setCustomValidity('Please enter a valid 3-letter airport code');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('departureDate').setAttribute('min', today);
+
+        // Load search history on page load
+        updateHistoryDisplay();
+
+        // Natural Language Search
+        document.getElementById('aiSearchBtn').addEventListener('click', async () => {
+            const query = document.getElementById('naturalLanguageQuery').value.trim();
+            if (!query) {
+                showError('Missing Query', 'Please describe your travel plans.');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const response = await fetch('/api/ai/parse-query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                const parsedData = await response.json();
+
+                if (response.ok && parsedData.parsed && parsedData.origin && parsedData.destination) {
+                    // Fill the form with parsed data
+                    if (parsedData.origin) document.getElementById('origin').value = parsedData.origin.toUpperCase();
+                    if (parsedData.destination) document.getElementById('destination').value = parsedData.destination.toUpperCase();
+                    if (parsedData.departure_date) document.getElementById('departureDate').value = parsedData.departure_date;
+                    if (parsedData.passengers) document.getElementById('passengers').value = parsedData.passengers;
+                    if (parsedData.currency) document.getElementById('preferredCurrency').value = parsedData.currency;
+
+                    // Show confidence indicator
+                    const confidence = parsedData.confidence_score || 0;
+                    const confidenceClass = confidence > 0.8 ? 'confidence-high' : confidence > 0.6 ? 'confidence-medium' : 'confidence-low';
+                    const confidenceText = confidence > 0.8 ? 'High' : confidence > 0.6 ? 'Medium' : 'Low';
+
+                    // Auto-submit the form
+                    showError('AI Parsed Your Request!',
+                        `Found: ${parsedData.origin || 'Origin'} to ${parsedData.destination || 'Destination'}.
+                        <span class="confidence-indicator ${confidenceClass}">${confidenceText} confidence</span>
+                        Searching for flights...`, 'success');
+                    setTimeout(() => {
+                        searchForm.dispatchEvent(new Event('submit'));
+                    }, 3000);
+                } else {
+                    showError('Could Not Understand', 'Please try rephrasing your travel request. For example: "Find flights from New York to Paris in June"');
+                }
+            } catch (error) {
+                showError('AI Search Failed', 'Unable to process your natural language query. Please use the form below instead.');
+            }
+        });
+
+        // AI Feature Event Listeners
+        document.getElementById('getDestinationInsights').addEventListener('click', () => {
+            const destination = document.getElementById('destination').value.toUpperCase();
+            if (destination) {
+                fetchDestinationInsights(destination);
+            } else {
+                showError('Destination Required', 'Please enter a destination airport code first.');
+            }
+        });
+
+        document.getElementById('analyzePrices').addEventListener('click', analyzePrices);
+        document.getElementById('getTravelTips').addEventListener('click', getTravelTips);
+
+        // Result Action Event Listeners
+        document.getElementById('bookBestDeal').addEventListener('click', bookBestDeal);
+        document.getElementById('compareAllOptions').addEventListener('click', compareAllOptions);
+        document.getElementById('saveSearch').addEventListener('click', saveSearch);
+
+        // Enhanced search input handling
+        document.getElementById('naturalLanguageQuery').addEventListener('input', (e) => {
+            showSearchSuggestions(e.target.value);
+        });
+
+        document.getElementById('naturalLanguageQuery').addEventListener('focus', () => {
+            const query = document.getElementById('naturalLanguageQuery').value;
+            if (query.length >= 3) {
+                showSearchSuggestions(query);
+            }
+        });
+
+        document.getElementById('naturalLanguageQuery').addEventListener('blur', () => {
+            // Delay hiding to allow clicks on suggestions
+            setTimeout(() => {
+                document.getElementById('searchSuggestions').style.display = 'none';
+            }, 200);
+        });
+
+        // Search Flights
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const origin = document.getElementById('origin').value.toUpperCase();
+            const destination = document.getElementById('destination').value.toUpperCase();
+            const departureDate = document.getElementById('departureDate').value;
+            const passengers = document.getElementById('passengers').value;
+            const preferredCurrency = document.getElementById('preferredCurrency').value;
+
+            if (!origin || !destination || !departureDate) {
+                showError('Missing Information', 'Please fill in all required fields.');
+                return;
+            }
+
+            if (!validateAirportCode(origin) || !validateAirportCode(destination)) {
+                showError('Invalid Airport Codes', 'Please enter valid 3-letter airport codes (e.g., JFK, LAX).');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                const params = new URLSearchParams({
+                    origin,
+                    destination,
+                    departure_date: departureDate,
+                    adults: passengers
+                });
+
+                const response = await fetch(`/api/flights/search?${params}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResults(data, preferredCurrency);
+
+                    // Store search results for AI analysis
+                    if (data.all_results) {
+                        localStorage.setItem('lastSearchResults', JSON.stringify(data.all_results));
+                    }
+
+                    // Save successful search to history and local storage
+                    const searchData = {
+                        origin,
+                        destination,
+                        departureDate,
+                        passengers: parseInt(passengers),
+                        preferredCurrency
+                    };
+                    saveSearch(searchData);
+                    localStorage.setItem('lastSearchData', JSON.stringify(searchData));
+
+                    // Fetch AI insights
+                    fetchAIInsights(searchData);
+
+                    // Show success message
+                    showError('Search Complete!', `Found flight options from ${origin} to ${destination}. AI insights loading...`, 'success');
+                    setTimeout(() => hideError(), 3000);
+                } else {
+                    showError('Search Failed', data.detail || 'An error occurred while searching for flights.');
+                }
+            } catch (error) {
+                showError('Connection Error', 'Unable to connect to the flight search service. Please try again later.');
+            }
+        });
     </script>
 </body>
 </html>

@@ -5,12 +5,10 @@ services:
     build: .
     ports:
       - "8000:8000"
-    volumes:
-      - ./uploads:/app/uploads
     environment:
       - API_HOST=0.0.0.0
       - API_PORT=8000
+      - AMADEUS_API_KEY=${AMADEUS_API_KEY}
+      - AMADEUS_API_SECRET=${AMADEUS_API_SECRET}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - UPLOAD_DIR=uploads
-      - MAX_UPLOAD_SIZE=10485760
     restart: unless-stopped

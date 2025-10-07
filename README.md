@@ -1,58 +1,85 @@
-# PDF Processing API with LangChain 🚀
+# Air Travel Tickets Price Comparison API ✈️
 
-A modern, scalable API for processing PDF documents using FastAPI, LangChain, and advanced NLP capabilities. This project provides both a REST API and a beautiful CLI interface for PDF processing tasks.
+A modern, scalable API for comparing air travel ticket prices across multiple currencies using the Amadeus API. This project provides both a REST API and a beautiful web interface for flight price comparison.
 
 ![Python Version](https://img.shields.io/badge/python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115.12-green)
-![LangChain](https://img.shields.io/badge/LangChain-0.3.25-orange)
+![Amadeus API](https://img.shields.io/badge/Amadeus-API-orange)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## 🌟 Features
 
-- **PDF Processing**
-  - Upload and process PDF files
-  - Extract text with metadata
-  - Intelligent text chunking for better processing
-  - LangChain integration for advanced NLP tasks
+- **Flight Price Comparison**
+  - Search flights between airports
+  - Compare prices across multiple currencies (USD, EUR, GBP, CAD, AUD)
+  - Find the lowest cost currency for tickets
+  - Real-time price data from Amadeus API
+
+- **AI-Powered Travel Assistant** 🤖
+  - Natural language flight search ("Find cheap flights to Paris next month")
+  - AI travel recommendations and insights
+  - Smart destination suggestions
+  - Personalized travel advice
+  - Price trend analysis and booking recommendations
 
 - **Modern API**
   - FastAPI-based REST API
   - Async processing
   - Automatic API documentation (Swagger/ReDoc)
   - CORS support
-  - File upload handling
+  - AI and currency conversion integration
 
-- **Beautiful CLI**
-  - Rich terminal UI
-  - Progress bars and tables
-  - Colorful output
-  - Interactive commands
+- **Beautiful Web Interface**
+  - Simple and intuitive UI with AI chat features
+  - Real-time search results with AI insights
+  - Responsive design with modern animations
+  - Search history and quick access
 
 - **Docker Support**
   - Containerized application
   - Easy deployment
-  - Volume management for uploads
+  - Environment variable management
 
 ## 📋 Prerequisites
 
 - Python 3.12+
 - Docker and Docker Compose (for containerized deployment)
-- OpenAI API key (for advanced NLP features)
+- Amadeus API key and secret (free developer account at https://developers.amadeus.com/)
+- OpenAI API key (for AI features at https://platform.openai.com/)
 
 ## 🚀 Quick Start
 
-### Using Docker (Recommended)
+### Using Netlify (Recommended for Static Deployment)
+
+1. **Connect to Netlify:**
+   - Push your code to GitHub
+   - Connect your repository to Netlify
+   - Netlify will automatically detect the `netlify.toml` configuration
+
+2. **Environment Variables:**
+   Set these in your Netlify dashboard:
+   ```
+   AMADEUS_API_KEY=your_amadeus_key
+   AMADEUS_API_SECRET=your_amadeus_secret
+   OPENAI_API_KEY=your_openai_key
+   ```
+
+3. **Deploy:**
+   - Netlify will build and deploy automatically
+   - Your site will be available at the generated URL
+
+### Using Docker (Recommended for Full Server)
 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd pdf-processing-api
+cd air-travel-price-comparison
 ```
 
 2. Create a `.env` file:
 ```bash
 cp .env.example .env
-# Edit .env with your OpenAI API key
+# Edit .env with your Amadeus API key and secret
 ```
 
 3. Start the application:
@@ -84,52 +111,41 @@ python -m app.main
 
 ### API Endpoints
 
-#### PDF Processing
+#### Flight Search
 
-- `POST /api/pdf/upload`
-  - Upload and process a PDF file
-  - Returns processed chunks of the PDF content
-  - Accepts PDF files only
+- `GET /api/flights/search`
+  - Search for flights and compare prices across currencies
+  - Query parameters: origin, destination, departure_date
+  - Returns price comparison results with lowest cost currency
 
-- `POST /api/pdf/extract-text`
-  - Extract raw text from a PDF file
-  - Returns the extracted text
-  - Accepts PDF files only
+### Web Interface
 
-### CLI Interface
-
-The CLI provides a user-friendly interface for interacting with the API:
-
-```bash
-# Upload and process a PDF
-./run_cli.py upload path/to/your/file.pdf
-
-# Extract text from a PDF
-./run_cli.py extract-text path/to/your/file.pdf --output-file output.txt
-
-# Show help
-./run_cli.py --help
-```
+Access the web interface at `http://localhost:8000` to:
+- **AI-Powered Search**: Describe your trip in plain English (e.g., "Find cheap flights from New York to London next month")
+- **Traditional Search**: Enter origin and destination airport codes with detailed options
+- **Smart Comparisons**: View price comparisons across currencies with AI insights
+- **Personalized Recommendations**: Get AI-powered travel advice and destination insights
+- **Search History**: Quick access to your recent searches
 
 ## 🏗️ Project Structure
 
 ```
-pdf-processing-api/
+air-travel-price-comparison/
 ├── app/
 │   ├── api/
-│   │   └── pdf_routes.py      # API endpoints
+│   │   └── flight_routes.py   # API endpoints for flight search
 │   ├── core/
 │   │   └── config.py          # Configuration
 │   ├── services/
-│   │   └── pdf_service.py     # PDF processing logic
-│   ├── cli.py                 # CLI interface
+│   │   └── flight_service.py  # Flight search and price comparison logic
+│   ├── static/
+│   │   └── index.html         # Web interface
 │   └── main.py               # FastAPI application
 ├── tests/
 │   ├── api/
-│   │   └── test_pdf_routes.py # API tests
+│   │   └── test_flight_routes.py # API tests
 │   └── services/
-│       └── test_pdf_service.py # Service tests
-├── uploads/                   # Upload directory
+│       └── test_flight_service.py # Service tests
 ├── Dockerfile                # Docker configuration
 ├── docker-compose.yml        # Docker Compose configuration
 ├── requirements.txt          # Python dependencies
@@ -156,9 +172,9 @@ The application can be configured using environment variables:
 |----------|-------------|---------|
 | API_HOST | API server host | 0.0.0.0 |
 | API_PORT | API server port | 8000 |
-| OPENAI_API_KEY | OpenAI API key | - |
-| UPLOAD_DIR | Upload directory | uploads |
-| MAX_UPLOAD_SIZE | Maximum file size (bytes) | 10485760 |
+| AMADEUS_API_KEY | Amadeus API key | - |
+| AMADEUS_API_SECRET | Amadeus API secret | - |
+| OPENAI_API_KEY | OpenAI API key (for AI features) | - |
 
 ## 📖 API Documentation
 
@@ -182,9 +198,34 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - [FastAPI](https://fastapi.tiangolo.com/)
-- [LangChain](https://python.langchain.com/)
-- [Typer](https://typer.tiangolo.com/)
-- [Rich](https://rich.readthedocs.io/)
+- [Amadeus for Developers](https://developers.amadeus.com/)
+- [OpenAI](https://openai.com/)
+- [ExchangeRate-API](https://exchangerate-api.com/)
+- [httpx](https://www.python-httpx.org/)
+
+## 🚀 Deployment Options
+
+### Netlify Deployment (Static + Serverless)
+
+The project includes full Netlify configuration for easy deployment:
+
+**Files included:**
+- `netlify.toml` - Build configuration
+- `netlify/functions/api.py` - Serverless API functions
+- `netlify/requirements.txt` - Python dependencies for functions
+- `app/static/_redirects` - SPA routing
+
+**Deployment Steps:**
+1. Push code to GitHub
+2. Connect repository to Netlify
+3. Set environment variables in Netlify dashboard
+4. Deploy automatically
+
+**Limitations:** Full flight search requires backend server. Use Docker for complete functionality.
+
+### Docker Deployment (Full Server)
+
+Use Docker for complete server-side functionality with real-time API integrations.
 
 ## 📞 Support
 

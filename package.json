@@ -1,7 +1,7 @@
 {
   "name": "ai-task",
   "version": "1.0.0",
-  "description": "A modern, scalable API for processing PDF documents using FastAPI, LangChain, and advanced NLP capabilities. This project provides both a REST API and a beautiful CLI interface for PDF processing tasks.",
+  "description": "A modern, scalable API for comparing air travel ticket prices across currencies using Amadeus API. This project provides both a REST API and a beautiful web interface for flight price comparison.",
   "main": "cypress.config.js",
   "directories": {
     "doc": "docs",
@@ -11,7 +11,10 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "test": "cypress run",
-    "test:watch": "cypress open"
+    "test:watch": "cypress open",
+    "build": "echo 'Static files are ready in app/static/'",
+    "netlify": "netlify dev",
+    "netlify:deploy": "netlify deploy --prod"
   },
   "keywords": [],
   "author": "",
