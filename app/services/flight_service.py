@@ -26,6 +26,88 @@ class FlightService:
             response.raise_for_status()
             return response.json()["access_token"]
 
+    def parse_flight_offer(self, offer: Dict) -> Dict:
+        """Parse raw Amadeus flight offer into user-friendly format"""
+        try:
+            itinerary = offer["itineraries"][0]  # Take first itinerary
+            segment = itinerary["segments"][0]   # Take first segment
+            price_info = offer["price"]
+            traveler_pricing = offer["travelerPricings"][0] if offer.get("travelerPricings") else {}
+
+            # Parse departure/arrival times
+            departure = segment["departure"]
+            arrival = segment["arrival"]
+
+            # Parse flight details
+            carrier_code = segment["carrierCode"]
+            flight_number = segment["number"]
+            aircraft = segment.get("aircraft", {}).get("code", "N/A")
+
+            # Parse baggage info
+            fare_details = traveler_pricing.get("fareDetailsBySegment", [{}])[0]
+            included_bags = fare_details.get("includedCheckedBags", {})
+            cabin_bags = fare_details.get("includedCabinBags", {})
+
+            # Parse amenities
+            amenities = []
+            if fare_details.get("amenities"):
+                for amenity in fare_details["amenities"]:
+                    if amenity.get("description"):
+                        amenities.append({
+                            "description": amenity["description"],
+                            "chargeable": amenity.get("isChargeable", False),
+                            "type": amenity.get("amenityType", "OTHER")
+                        })
+
+            return {
+                "flight_info": {
+                    "airline": carrier_code,
+                    "flight_number": f"{carrier_code}{flight_number}",
+                    "aircraft": aircraft,
+                    "duration": itinerary["duration"]
+                },
+                "departure": {
+                    "airport": departure["iataCode"],
+                    "terminal": departure.get("terminal"),
+                    "time": departure["at"]
+                },
+                "arrival": {
+                    "airport": arrival["iataCode"],
+                    "terminal": arrival.get("terminal"),
+                    "time": arrival["at"]
+                },
+                "baggage": {
+                    "checked_bags": {
+                        "quantity": included_bags.get("quantity", 0),
+                        "additional_fee": price_info.get("additionalServices", [])
+                    },
+                    "cabin_bags": {
+                        "quantity": cabin_bags.get("quantity", 0)
+                    }
+                },
+                "pricing": {
+                    "total": float(price_info["total"]),
+                    "base_fare": float(price_info["base"]),
+                    "taxes_fees": float(price_info["total"]) - float(price_info["base"]),
+                    "currency": price_info["currency"]
+                },
+                "amenities": amenities,
+                "booking_info": {
+                    "last_ticketing_date": offer.get("lastTicketingDate"),
+                    "seats_available": offer.get("numberOfBookableSeats", 0),
+                    "instant_ticketing": offer.get("instantTicketingRequired", False)
+                }
+            }
+        except (KeyError, IndexError, ValueError) as e:
+            # Fallback to basic info if parsing fails
+            return {
+                "flight_info": {"airline": "Unknown", "flight_number": "Unknown"},
+                "departure": {"airport": origin, "time": "Unknown"},
+                "arrival": {"airport": destination, "time": "Unknown"},
+                "pricing": {"total": float(offer.get("price", {}).get("total", 0))},
+                "error": f"Parsing failed: {str(e)}"
+            }
+
     async def search_flights(self, origin: str, destination: str, departure_date: str, currency: str = "USD", adults: int = 1) -> Dict:
         """Search for flight offers in specified currency"""
         token = await self.get_access_token()
@@ -52,10 +134,12 @@ class FlightService:
             # Get the cheapest offer
             if data.get("data"):
                 cheapest = min(data["data"], key=lambda x: float(x["price"]["total"]))
+                parsed_offer = self.parse_flight_offer(cheapest)
                 return {
                     "currency": currency,
                     "price": float(cheapest["price"]["total"]),
-                    "offer": cheapest
+                    "parsed_offer": parsed_offer,
+                    "raw_offer": cheapest  # Keep raw data for debugging
                 }
             return None
 

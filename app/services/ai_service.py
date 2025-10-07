@@ -26,7 +26,7 @@ class AIService:
             """
 
             completion = await self.client.chat.completions.create(
-                model="openai/gpt-oss-20b",
+                model="gemma2-9b-it",
                 messages=[{"role": "user", "content": prompt}],
                 max_completion_tokens=500,
                 temperature=0.7
@@ -62,7 +62,7 @@ class AIService:
             """
 
             completion = await self.client.chat.completions.create(
-                model="openai/gpt-oss-20b",
+                model="gemma2-9b-it",
                 messages=[{"role": "user", "content": prompt}],
                 max_completion_tokens=300,
                 temperature=0.6
@@ -95,7 +95,7 @@ class AIService:
             """
 
             completion = await self.client.chat.completions.create(
-                model="openai/gpt-oss-20b",
+                model="gemma2-9b-it",
                 messages=[{"role": "user", "content": prompt}],
                 max_completion_tokens=400,
                 temperature=0.7
@@ -134,7 +134,7 @@ class AIService:
             """
 
             completion = await self.client.chat.completions.create(
-                model="openai/gpt-oss-20b",
+                model="gemma2-9b-it",
                 messages=[{"role": "user", "content": prompt}],
                 max_completion_tokens=200,
                 temperature=0.3

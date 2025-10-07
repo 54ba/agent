@@ -1032,12 +1032,21 @@
                 return a.price_usd - b.price_usd; // Then by USD price
             });
 
-            // Show all results
+            // Show all results with detailed flight information
             allResults.innerHTML = '';
             sortedResults.forEach(result => {
                 const isBest = result.currency === data.lowest_currency &&
                               Math.abs(result.price - data.lowest_price) < 0.01;
                 const isPreferred = result.currency === preferredCurrency;
+
+                // Get parsed flight details
+                const parsedOffer = result.parsed_offer || {};
+                const flightInfo = parsedOffer.flight_info || {};
+                const departure = parsedOffer.departure || {};
+                const arrival = parsedOffer.arrival || {};
+                const baggage = parsedOffer.baggage || {};
+                const pricing = parsedOffer.pricing || {};
+                const booking = parsedOffer.booking_info || {};
 
                 const card = document.createElement('div');
                 card.className = `result-card ${isBest ? 'best' : ''} ${isPreferred ? 'preferred' : ''}`;
@@ -1045,6 +1054,48 @@
                     <div class="currency">${result.currency} ${isPreferred ? '<i class="fas fa-heart" style="color: #e74c3c;"></i>' : ''}</div>
                     <div class="price">${formatCurrency(result.price, result.currency)}</div>
                     <div class="usd-equivalent">≈ ${formatCurrency(result.price_usd, 'USD')} USD</div>
+
+                    ${flightInfo.airline ? `
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="font-weight: bold; color: #333;">
+                                    <i class="fas fa-plane"></i> ${flightInfo.airline} ${flightInfo.flight_number || ''}
+                                </div>
+                                <div style="font-size: 0.9em; color: #666;">
+                                    ${flightInfo.duration || 'Duration N/A'}
+                                </div>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div>
+                                    <div style="font-weight: bold;">${departure.time ? new Date(departure.time).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) : 'Time N/A'}</div>
+                                    <div style="font-size: 0.9em; color: #666;">${departure.airport || 'DEP'} ${departure.terminal ? `(Terminal ${departure.terminal})` : ''}</div>
+                                </div>
+                                <div style="flex: 1; text-align: center; color: #999;">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-weight: bold;">${arrival.time ? new Date(arrival.time).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) : 'Time N/A'}</div>
+                                    <div style="font-size: 0.9em; color: #666;">${arrival.airport || 'ARR'} ${arrival.terminal ? `(Terminal ${arrival.terminal})` : ''}</div>
+                                </div>
+                            </div>
+
+                            ${baggage.cabin_bags || baggage.checked_bags ? `
+                                <div style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
+                                    <i class="fas fa-suitcase"></i>
+                                    ${baggage.cabin_bags && baggage.cabin_bags.quantity > 0 ? `Cabin: ${baggage.cabin_bags.quantity}` : ''}
+                                    ${baggage.checked_bags && baggage.checked_bags.quantity > 0 ? ` | Checked: ${baggage.checked_bags.quantity}` : ''}
+                                </div>
+                            ` : ''}
+
+                            ${booking.seats_available ? `
+                                <div style="font-size: 0.9em; color: #28a745;">
+                                    <i class="fas fa-chair"></i> ${booking.seats_available} seats available
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : ''}
+
                     ${isBest ? '<div style="color: #667eea; font-weight: bold; margin-top: 10px;"><i class="fas fa-star"></i> Best Deal!</div>' : ''}
                     ${isPreferred ? '<div style="color: #e74c3c; font-weight: bold; margin-top: 5px;"><i class="fas fa-heart"></i> Your Preferred Currency</div>' : ''}
                 `;

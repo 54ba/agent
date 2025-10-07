@@ -73,7 +73,7 @@ def test_groq_key():
                 "Content-Type": "application/json"
             },
             json={
-                "model": "openai/gpt-oss-20b",
+                "model": "gemma2-9b-it",
                 "messages": [{"role": "user", "content": "Hello"}],
                 "max_tokens": 5
             },
