@@ -626,13 +626,20 @@
 
         // Load configuration on page load
         async function loadConfig() {
+            // For localhost, use relative URLs directly
+            if (window.location.hostname === 'localhost') {
+                API_BASE_URL = '';
+                return;
+            }
+
+            // For production, try to load config from server
             try {
                 const response = await fetch('/api/config');
                 const config = await response.json();
-                API_BASE_URL = config.api_base_url || '';
+                API_BASE_URL = config.api_base_url || 'http://localhost:8000';
             } catch (error) {
-                // Fallback to localhost detection
-                API_BASE_URL = window.location.hostname === 'localhost' ? '' : 'http://localhost:8000';
+                // Fallback for production
+                API_BASE_URL = 'http://localhost:8000';
                 console.log('Config load failed, using fallback:', API_BASE_URL);
             }
         }
