@@ -53,27 +53,27 @@ def test_amadeus_keys():
         print(f"❌ ERROR: Connection failed: {str(e)}")
         return False
 
-def test_grok_key():
-    """Test Grok API key (optional)"""
-    api_key = os.getenv('GROK_API_KEY')
+def test_groq_key():
+    """Test Groq API key (optional)"""
+    api_key = os.getenv('GROQ_API_KEY')
 
-    if not api_key or api_key == 'your_grok_api_key_here':
-        print("⚠️  WARNING: Grok API key not set or is placeholder")
+    if not api_key or api_key == 'your_groq_api_key_here':
+        print("⚠️  WARNING: Groq API key not set or is placeholder")
         print("AI features (natural language search, recommendations) will be limited.")
-        print("Get a free key from: https://console.x.ai/")
-        print("Note: Grok is completely free with no usage limits!")
+        print("Get a free key from: https://console.groq.com/")
+        print("Note: Groq offers fast inference with various models!")
         return False
 
     try:
-        # Simple test request to Grok API
+        # Simple test request to Groq API
         response = httpx.post(
-            "https://api.x.ai/v1/chat/completions",
+            "https://api.groq.com/openai/v1/chat/completions",
             headers={
                 "Authorization": f"Bearer {api_key}",
                 "Content-Type": "application/json"
             },
             json={
-                "model": "grok-beta",
+                "model": "llama3-8b-8192",
                 "messages": [{"role": "user", "content": "Hello"}],
                 "max_tokens": 5
             },
@@ -83,25 +83,25 @@ def test_grok_key():
         if response.status_code == 200:
             data = response.json()
             if data.get("choices") and len(data["choices"]) > 0:
-                print("✅ SUCCESS: Grok API key is valid!")
-                print("🤖 AI features are now fully enabled with Grok!")
+                print("✅ SUCCESS: Groq API key is valid!")
+                print("🤖 AI features are now fully enabled with Groq!")
                 return True
             else:
-                print("❌ ERROR: Grok API returned invalid response")
+                print("❌ ERROR: Groq API returned invalid response")
                 return False
         elif response.status_code == 401:
-            print("❌ ERROR: Grok API key is invalid")
+            print("❌ ERROR: Groq API key is invalid")
             return False
         elif response.status_code == 429:
-            print("⚠️  WARNING: Grok API rate limited (shouldn't happen with free tier)")
+            print("⚠️  WARNING: Groq API rate limited")
             return False
         else:
-            print(f"❌ ERROR: Grok API test failed with status {response.status_code}")
+            print(f"❌ ERROR: Groq API test failed with status {response.status_code}")
             print(f"Response: {response.text[:200]}")
             return False
 
     except Exception as e:
-        print(f"❌ ERROR: Grok API test failed: {str(e)}")
+        print(f"❌ ERROR: Groq API test failed: {str(e)}")
         return False
 
 if __name__ == "__main__":
@@ -110,16 +110,16 @@ if __name__ == "__main__":
 
     amadeus_ok = test_amadeus_keys()
     print()
-    grok_ok = test_grok_key()
+    groq_ok = test_groq_key()
 
     print()
     print("=" * 60)
     if amadeus_ok:
         print("🎉 Ready to search flights!")
-        if grok_ok:
-            print("🤖 AI features fully enabled with Grok!")
+        if groq_ok:
+            print("🤖 AI features fully enabled with Groq!")
         else:
-            print("⚠️  AI features limited (Grok API key needed)")
+            print("⚠️  AI features limited (Groq API key needed)")
     else:
         print("❌ Please fix Amadeus API keys before using the service")
         sys.exit(1)

@@ -11,7 +11,7 @@ class AIService:
     async def get_travel_recommendations(self, search_data: Dict) -> Dict:
         """Get AI-powered travel recommendations based on search"""
         if not self.api_key:
-            return {"recommendations": [], "insights": "AI features require Grok API key"}
+            return {"recommendations": [], "insights": "AI features require Groq API key"}
 
         try:
             prompt = f"""
@@ -44,7 +44,7 @@ class AIService:
     async def analyze_price_trends(self, prices: List[Dict]) -> Dict:
         """Analyze price trends and provide insights"""
         if not self.api_key:
-            return {"trend": "neutral", "analysis": "Price trend analysis requires Grok API key"}
+            return {"trend": "neutral", "analysis": "Price trend analysis requires Groq API key"}
 
         try:
             prices_text = "\n".join([f"{p['currency']}: {p['price']}" for p in prices])
@@ -81,7 +81,7 @@ class AIService:
     async def get_destination_insights(self, destination: str) -> Dict:
         """Get AI insights about a destination"""
         if not self.api_key:
-            return {"insights": "Destination insights require Grok API key"}
+            return {"insights": "Destination insights require Groq API key"}
 
         try:
             prompt = f"""
@@ -115,7 +115,7 @@ class AIService:
     async def process_natural_language_query(self, query: str) -> Dict:
         """Process natural language flight search queries"""
         if not self.api_key:
-            return {"parsed": False, "message": "Natural language processing requires Grok API key"}
+            return {"parsed": False, "message": "Natural language processing requires Groq API key"}
 
         try:
             prompt = f"""
