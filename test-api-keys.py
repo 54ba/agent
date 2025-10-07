@@ -73,7 +73,7 @@ def test_groq_key():
                 "Content-Type": "application/json"
             },
             json={
-                "model": "llama3-8b-8192",
+                "model": "llama3-70b-8192",
                 "messages": [{"role": "user", "content": "Hello"}],
                 "max_tokens": 5
             },

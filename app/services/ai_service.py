@@ -62,7 +62,7 @@ class AIService:
             """
 
             completion = await self.client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama3-70b-8192",
                 messages=[{"role": "user", "content": prompt}],
                 max_completion_tokens=300,
                 temperature=0.6
@@ -95,7 +95,7 @@ class AIService:
             """
 
             completion = await self.client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama3-70b-8192",
                 messages=[{"role": "user", "content": prompt}],
                 max_completion_tokens=400,
                 temperature=0.7
@@ -134,7 +134,7 @@ class AIService:
             """
 
             completion = await self.client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama3-70b-8192",
                 messages=[{"role": "user", "content": prompt}],
                 max_completion_tokens=200,
                 temperature=0.3
