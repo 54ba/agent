@@ -1101,7 +1101,11 @@
                         searchForm.dispatchEvent(new Event('submit'));
                     }, 3000);
                 } else {
-                    showError('Could Not Understand', 'Please try rephrasing your travel request. For example: "Find flights from New York to Paris in June"');
+                    if (parsedData.message && (parsedData.message.includes('OpenAI API key') || parsedData.message.includes('insufficient_quota') || parsedData.message.includes('billing'))) {
+                        showError('AI Features Limited', 'AI search requires a valid OpenAI API key with credits. Please use the regular search form below, or check your OpenAI account billing.');
+                    } else {
+                        showError('Could Not Understand', 'Please try rephrasing your travel request. For example: "Find flights from New York to Paris in June"');
+                    }
                 }
             } catch (error) {
                 showError('AI Search Failed', 'Unable to process your natural language query. Please use the form below instead.');

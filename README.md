@@ -15,12 +15,13 @@ A modern, scalable API for comparing air travel ticket prices across multiple cu
   - Find the lowest cost currency for tickets
   - Real-time price data from Amadeus API
 
-- **AI-Powered Travel Assistant** 🤖
+- **AI-Powered Travel Assistant with Grok** 🤖
   - Natural language flight search ("Find cheap flights to Paris next month")
-  - AI travel recommendations and insights
+  - Grok AI travel recommendations and insights
   - Smart destination suggestions
   - Personalized travel advice
   - Price trend analysis and booking recommendations
+  - Completely free AI assistance!
 
 - **Modern API**
   - FastAPI-based REST API
@@ -44,7 +45,51 @@ A modern, scalable API for comparing air travel ticket prices across multiple cu
 
 - Python 3.12+
 - Docker and Docker Compose (for containerized deployment)
-- Amadeus API key and secret (free developer account at https://developers.amadeus.com/)
+- Amadeus API key and secret (free developer account)
+- Grok API key (for AI features, optional - completely free!)
+
+### Getting Amadeus API Keys (Free)
+
+1. **Sign up for Amadeus Developer Account:**
+   - Go to https://developers.amadeus.com/
+   - Click "Register" and create your account
+   - Verify your email
+
+2. **Create an Application:**
+   - Go to "My Apps" in your dashboard
+   - Click "Create a new app"
+   - Fill in the details (any name/description)
+   - Select "Flight Offers Search" API
+
+3. **Get Your API Keys:**
+   - Your API Key and API Secret will be displayed
+   - Copy them to your `.env` file
+
+**Note:** Amadeus provides 2000 free API calls per month for developers.
+
+### Getting Grok API Key (Optional, for AI features)
+
+**Note:** AI features are optional. The flight search works without them, but you'll get enhanced experiences with Grok.
+
+1. **Go to xAI Console:**
+   - Visit https://console.x.ai/
+   - Sign up or log in to your account
+
+2. **Create API Key:**
+   - Generate a new API key from your dashboard
+   - Copy the key (save it securely)
+
+3. **Update .env file:**
+```bash
+GROK_API_KEY=your-grok-api-key-here
+```
+
+4. **Test the key:**
+```bash
+python test-api-keys.py
+```
+
+**Cost:** Grok is completely FREE with no usage limits or hidden costs! 🎉
 - OpenAI API key (for AI features at https://platform.openai.com/)
 
 ## 🚀 Quick Start
@@ -82,7 +127,12 @@ cp .env.example .env
 # Edit .env with your Amadeus API key and secret
 ```
 
-3. Start the application:
+3. **Test your API keys (recommended):**
+```bash
+python test-api-keys.py
+```
+
+4. Start the application:
 ```bash
 docker-compose up -d
 ```
@@ -102,7 +152,12 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Start the API server:
+3. **Test your API keys (recommended):**
+```bash
+python test-api-keys.py
+```
+
+4. Start the API server:
 ```bash
 python -m app.main
 ```
@@ -226,6 +281,66 @@ The project includes full Netlify configuration for easy deployment:
 ### Docker Deployment (Full Server)
 
 Use Docker for complete server-side functionality with real-time API integrations.
+
+## 🔧 Troubleshooting
+
+### API Key Issues
+
+**"Connection Error - Unable to connect to the flight search service"**
+
+This error occurs when Amadeus API keys are not properly configured:
+
+1. **Check your `.env` file:**
+```bash
+python test-api-keys.py
+```
+
+2. **Get real Amadeus API keys:**
+   - Visit https://developers.amadeus.com/
+   - Create a free developer account
+   - Generate API Key and Secret
+   - Update your `.env` file
+
+3. **Restart the service:**
+```bash
+# Stop the current service (Ctrl+C)
+python -m app.main
+```
+
+**"AI Search Failed - Unable to process your natural language query"**
+
+This occurs when Grok API access is limited:
+
+**Possible causes:**
+1. **No API key configured** - Add Grok key to `.env`
+2. **Invalid API key** - Verify the key is correct
+3. **Network issues** - Check internet connection
+
+**Solutions:**
+
+1. **For missing/invalid API key:**
+```bash
+# Get free key from: https://console.x.ai/
+# Add to .env: GROK_API_KEY=your-grok-key-here
+python test-api-keys.py
+```
+
+2. **Restart service:**
+```bash
+python -m app.main
+```
+
+**Note:** AI features are optional. The regular flight search form works without Grok. Plus, Grok is completely free!
+
+**"AI features not available"**
+
+This is normal if OpenAI API key is not configured. The service will work without AI features.
+
+### Common Issues
+
+- **"Module not found"**: Run `pip install -r requirements.txt`
+- **"Port already in use"**: Change port in `app/core/config.py`
+- **"Permission denied"**: Check file permissions for `.env`
 
 ## 📞 Support
 

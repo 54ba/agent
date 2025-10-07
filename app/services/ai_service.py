@@ -1,17 +1,17 @@
-from openai import OpenAI
+from groq import AsyncGroq
 from typing import Dict, List, Optional
 from app.core.config import settings
 import json
 
 class AIService:
     def __init__(self):
-        self.api_key = settings.OPENAI_API_KEY
-        self.client = OpenAI(api_key=self.api_key) if self.api_key else None
+        self.api_key = settings.GROQ_API_KEY
+        self.client = AsyncGroq(api_key=self.api_key) if self.api_key else None
 
     async def get_travel_recommendations(self, search_data: Dict) -> Dict:
         """Get AI-powered travel recommendations based on search"""
         if not self.api_key:
-            return {"recommendations": [], "insights": "AI features require OpenAI API key"}
+            return {"recommendations": [], "insights": "AI features require Grok API key"}
 
         try:
             prompt = f"""
@@ -25,14 +25,14 @@ class AIService:
             Format as JSON with keys: recommendations (array), insights (string)
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+            completion = await self.client.chat.completions.create(
+                model="llama3-8b-8192",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=500,
+                max_completion_tokens=500,
                 temperature=0.7
             )
 
-            content = response.choices[0].message.content
+            content = completion.choices[0].message.content
             return json.loads(content)
 
         except Exception as e:
@@ -44,7 +44,7 @@ class AIService:
     async def analyze_price_trends(self, prices: List[Dict]) -> Dict:
         """Analyze price trends and provide insights"""
         if not self.api_key:
-            return {"trend": "neutral", "analysis": "Price trend analysis requires OpenAI API key"}
+            return {"trend": "neutral", "analysis": "Price trend analysis requires Grok API key"}
 
         try:
             prices_text = "\n".join([f"{p['currency']}: {p['price']}" for p in prices])
@@ -61,14 +61,14 @@ class AIService:
             Format as JSON with keys: best_value_currency, trend_analysis, booking_recommendation
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+            completion = await self.client.chat.completions.create(
+                model="llama3-8b-8192",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=300,
+                max_completion_tokens=300,
                 temperature=0.6
             )
 
-            content = response.choices[0].message.content
+            content = completion.choices[0].message.content
             return json.loads(content)
 
         except Exception as e:
@@ -81,7 +81,7 @@ class AIService:
     async def get_destination_insights(self, destination: str) -> Dict:
         """Get AI insights about a destination"""
         if not self.api_key:
-            return {"insights": "Destination insights require OpenAI API key"}
+            return {"insights": "Destination insights require Grok API key"}
 
         try:
             prompt = f"""
@@ -94,14 +94,14 @@ class AIService:
             Format as JSON with keys: best_time_to_visit, attractions, travel_tips, transportation
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+            completion = await self.client.chat.completions.create(
+                model="llama3-8b-8192",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=400,
+                max_completion_tokens=400,
                 temperature=0.7
             )
 
-            content = response.choices[0].message.content
+            content = completion.choices[0].message.content
             return json.loads(content)
 
         except Exception as e:
@@ -115,7 +115,7 @@ class AIService:
     async def process_natural_language_query(self, query: str) -> Dict:
         """Process natural language flight search queries"""
         if not self.api_key:
-            return {"parsed": False, "message": "Natural language processing requires OpenAI API key"}
+            return {"parsed": False, "message": "Natural language processing requires Grok API key"}
 
         try:
             prompt = f"""
@@ -133,14 +133,14 @@ class AIService:
             If information is not available, use null values.
             """
 
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+            completion = await self.client.chat.completions.create(
+                model="llama3-8b-8192",
                 messages=[{"role": "user", "content": prompt}],
-                max_tokens=200,
+                max_completion_tokens=200,
                 temperature=0.3
             )
 
-            content = response.choices[0].message.content
+            content = completion.choices[0].message.content
             result = json.loads(content)
 
             # Validate airport codes if they look like codes
