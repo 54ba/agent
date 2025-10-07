@@ -31,6 +31,13 @@ app.include_router(ai_router, prefix="/api/ai", tags=["ai"])
 async def root():
     return {"message": "Welcome to Air Travel Tickets Price Comparison API"}
 
+@app.get("/api/config")
+async def get_config():
+    return {
+        "api_base_url": settings.API_BASE_URL,
+        "environment": "development" if settings.API_HOST == "0.0.0.0" else "production"
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(

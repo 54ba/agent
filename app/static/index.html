@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="api-base-url" content="">
     <title>✈️ Air Travel Price Comparison</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -620,6 +621,22 @@
     </div>
 
     <script>
+        // API Configuration - will be set after config fetch
+        let API_BASE_URL = '';
+
+        // Load configuration on page load
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+                API_BASE_URL = config.api_base_url || '';
+            } catch (error) {
+                // Fallback to localhost detection
+                API_BASE_URL = window.location.hostname === 'localhost' ? '' : 'http://localhost:8000';
+                console.log('Config load failed, using fallback:', API_BASE_URL);
+            }
+        }
+
         const searchForm = document.getElementById('searchForm');
         const searchBtn = document.getElementById('searchBtn');
         const loading = document.getElementById('loading');
@@ -760,7 +777,7 @@
         // AI Insights functions
         async function fetchAIInsights(searchData) {
             try {
-                const response = await fetch('/api/ai/recommendations', {
+                const response = await fetch(`${API_BASE_URL}/api/ai/recommendations`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -784,7 +801,7 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
 
             try {
-                const response = await fetch(`/api/ai/destination-insights/${destination}`);
+                const response = await fetch(`${API_BASE_URL}/api/ai/destination-insights/${destination}`);
                 const insights = await response.json();
 
                 if (response.ok) {
@@ -814,7 +831,7 @@
                     return;
                 }
 
-                const response = await fetch('/api/ai/analyze-prices', {
+                const response = await fetch(`${API_BASE_URL}/api/ai/analyze-prices`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -887,7 +904,7 @@
 
             try {
                 const searchData = JSON.parse(localStorage.getItem('lastSearchData') || '{}');
-                const response = await fetch('/api/ai/recommendations', {
+                const response = await fetch(`${API_BASE_URL}/api/ai/recommendations`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1055,8 +1072,10 @@
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('departureDate').setAttribute('min', today);
 
-        // Load search history on page load
-        updateHistoryDisplay();
+        // Load configuration and search history on page load
+        loadConfig().then(() => {
+            updateHistoryDisplay();
+        });
 
         // Natural Language Search
         document.getElementById('aiSearchBtn').addEventListener('click', async () => {
@@ -1069,7 +1088,7 @@
             showLoading();
 
             try {
-                const response = await fetch('/api/ai/parse-query', {
+                const response = await fetch(`${API_BASE_URL}/api/ai/parse-query`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1179,7 +1198,7 @@
                     adults: passengers
                 });
 
-                const response = await fetch(`/api/flights/search?${params}`);
+                const response = await fetch(`${API_BASE_URL}/api/flights/search?${params}`);
                 const data = await response.json();
 
                 if (response.ok) {

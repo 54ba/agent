@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = os.path.join("app", "uploads")
     MAX_UPLOAD_SIZE: int = 10485760  # 10MB in bytes
 
+    # Frontend API Configuration
+    API_BASE_URL: str = ""
+
     class Config:
         env_file = ".env"
 
