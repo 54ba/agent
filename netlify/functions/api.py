@@ -9,6 +9,7 @@ ai_service = AIService()
 
 async def handler(event, context):
     """Main Netlify Function handler"""
+    print(f"Handler called with path: {event.get('path', '')}, method: {event.get('httpMethod', 'GET')}")
     try:
         # Get the path and method
         path = event.get('path', '')
@@ -34,7 +35,9 @@ async def handler(event, context):
                 }
 
         # Route to appropriate handler
+        print(f"Routing path: {path}, method: {http_method}")
         if path == '/flights/search' and http_method == 'GET':
+            print("Calling handle_flight_search")
             return await handle_flight_search(query_params)
         elif path == '/ai/recommendations' and http_method == 'POST':
             return await handle_recommendations(body)
@@ -53,6 +56,9 @@ async def handler(event, context):
             }
 
     except Exception as e:
+        print(f"Exception in handler: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json'},
@@ -61,11 +67,13 @@ async def handler(event, context):
 
 async def handle_flight_search(query_params):
     """Handle flight search requests"""
+    print(f"handle_flight_search called with params: {query_params}")
     try:
         origin = query_params.get('origin')
         destination = query_params.get('destination')
         departure_date = query_params.get('departure_date')
         adults = int(query_params.get('adults', 1))
+        print(f"Parsed params: origin={origin}, dest={destination}, date={departure_date}, adults={adults}")
 
         if not all([origin, destination, departure_date]):
             return {
@@ -84,7 +92,9 @@ async def handle_flight_search(query_params):
                 'body': json.dumps({'error': 'Invalid date format. Use YYYY-MM-DD'})
             }
 
+        print("Calling flight_service.compare_prices")
         result = await flight_service.compare_prices(origin, destination, departure_date, adults)
+        print(f"compare_prices returned: {result}")
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json'},

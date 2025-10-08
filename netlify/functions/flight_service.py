@@ -13,6 +13,7 @@ class FlightService:
 
     async def get_access_token(self) -> str:
         """Get Amadeus access token"""
+        print(f"Getting access token with key: {self.api_key[:10] if self.api_key else 'None'}...")
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 f"{self.base_url}/v1/security/oauth2/token",

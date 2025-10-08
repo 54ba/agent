@@ -823,6 +823,7 @@
         // AI Insights functions
         async function fetchAIInsights(searchData) {
             try {
+                console.log('Making API request to /api/ai/recommendations:', searchData);
                 const response = await fetch(`${API_BASE_URL}/api/ai/recommendations`, {
                     method: 'POST',
                     headers: {
@@ -833,7 +834,10 @@
 
                 if (response.ok) {
                     const insights = await response.json();
+                    console.log('AI insights response:', insights);
                     displayAIInsights(insights);
+                } else {
+                    console.log('AI insights request failed:', response.status, response.statusText);
                 }
             } catch (error) {
                 console.log('AI insights not available:', error);
@@ -847,15 +851,19 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
 
             try {
+                console.log('Making API request to /api/ai/destination-insights/' + destination);
                 const response = await fetch(`${API_BASE_URL}/api/ai/destination-insights/${destination}`);
                 const insights = await response.json();
+                console.log('Destination insights response:', insights);
 
                 if (response.ok) {
                     displayDestinationInsights(insights, destination);
                 } else {
+                    console.log('Destination insights request failed:', response.status, response.statusText);
                     showError('Destination Insights', 'Unable to load destination information.');
                 }
             } catch (error) {
+                console.log('Destination insights error:', error);
                 showError('Destination Insights', 'AI service temporarily unavailable.');
             } finally {
                 btn.disabled = false;
@@ -876,7 +884,7 @@
                     showError('Price Analysis', 'Please perform a flight search first.');
                     return;
                 }
-
+                console.log('Making API request to /api/ai/analyze-prices:', { prices: currentResults });
                 const response = await fetch(`${API_BASE_URL}/api/ai/analyze-prices`, {
                     method: 'POST',
                     headers: {
@@ -886,13 +894,16 @@
                 });
 
                 const analysis = await response.json();
+                console.log('Price analysis response:', analysis);
 
                 if (response.ok) {
                     displayPriceAnalysis(analysis);
                 } else {
+                    console.log('Price analysis request failed:', response.status, response.statusText);
                     showError('Price Analysis', 'Unable to analyze price trends.');
                 }
             } catch (error) {
+                console.log('Price analysis error:', error);
                 showError('Price Analysis', 'AI analysis service temporarily unavailable.');
             } finally {
                 btn.disabled = false;
@@ -951,6 +962,7 @@
 
             try {
                 const searchData = JSON.parse(localStorage.getItem('lastSearchData') || '{}');
+                console.log('Making API request to /api/ai/recommendations for tips:', searchData);
                 const response = await fetch(`${API_BASE_URL}/api/ai/recommendations`, {
                     method: 'POST',
                     headers: {
@@ -960,6 +972,7 @@
                 });
 
                 const tips = await response.json();
+                console.log('Travel tips response:', tips);
 
                 if (response.ok) {
                     const tipsDiv = document.createElement('div');
@@ -973,9 +986,11 @@
                     insightsContent.appendChild(tipsDiv);
                     aiInsights.style.display = 'block';
                 } else {
+                    console.log('Travel tips request failed:', response.status, response.statusText);
                     showError('Tips Unavailable', 'AI travel tips are temporarily unavailable.');
                 }
             } catch (error) {
+                console.log('Travel tips error:', error);
                 showError('Tips Error', 'Unable to load travel tips.');
             } finally {
                 btn.disabled = false;
@@ -1195,6 +1210,7 @@
             showLoading();
 
             try {
+                console.log('Making API request to /api/ai/parse-query:', { query });
                 const response = await fetch(`${API_BASE_URL}/api/ai/parse-query`, {
                     method: 'POST',
                     headers: {
@@ -1204,6 +1220,7 @@
                 });
 
                 const parsedData = await response.json();
+                console.log('Parse query response:', parsedData);
 
                 if (response.ok && parsedData.parsed && parsedData.origin && parsedData.destination) {
                     // Display the parsed data
@@ -1239,6 +1256,7 @@
                         searchForm.dispatchEvent(new Event('submit'));
                     }, 3000);
                 } else {
+                    console.log('Parse query request failed:', response.status, response.statusText, parsedData);
                     if (parsedData.message && (parsedData.message.includes('OpenAI API key') || parsedData.message.includes('insufficient_quota') || parsedData.message.includes('billing'))) {
                         showError('AI Features Limited', 'AI search requires a valid OpenAI API key with credits. Please use the regular search form below, or check your OpenAI account billing.');
                     } else {
@@ -1246,6 +1264,7 @@
                     }
                 }
             } catch (error) {
+                console.log('Parse query error:', error);
                 showError('AI Search Failed', 'Unable to process your natural language query. Please use the form below instead.');
             }
         });
@@ -1316,9 +1335,11 @@
                     departure_date: departureDate,
                     adults: passengers
                 });
-
-                const response = await fetch(`${API_BASE_URL}/api/flights/search?${params}`);
+                const url = `${API_BASE_URL}/api/flights/search?${params}`;
+                console.log('Making API request to flight search:', url);
+                const response = await fetch(url);
                 const data = await response.json();
+                console.log('Flight search response:', data);
 
                 if (response.ok) {
                     showResults(data, preferredCurrency);
@@ -1346,9 +1367,11 @@
                     showError('Search Complete!', `Found flight options from ${origin} to ${destination}. AI insights loading...`, 'success');
                     setTimeout(() => hideError(), 3000);
                 } else {
+                    console.log('Flight search request failed:', response.status, response.statusText, data);
                     showError('Search Failed', data.detail || 'An error occurred while searching for flights.');
                 }
             } catch (error) {
+                console.log('Flight search error:', error);
                 showError('Connection Error', 'Unable to connect to the flight search service. Please try again later.');
             }
         });
