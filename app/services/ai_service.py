@@ -31,7 +31,7 @@ class AIService:
             3. Travel tips and cost-saving advice
 
             Respond ONLY with valid JSON. Do not include any explanatory text, conversational responses, or markdown formatting. Start your response with {{ and end with }}.
-            Format as JSON with keys: recommendations (array), insights (string)
+            Format as JSON with keys: recommendations (array of objects with 'type' and 'value' keys), insights (string)
             """
 
             completion = await self.client.chat.completions.create(

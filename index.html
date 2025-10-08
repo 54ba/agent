@@ -26,7 +26,6 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
         }
 
         .header {
@@ -145,7 +144,6 @@
         }
 
         .results {
-            display: none;
             padding: 0 40px 40px;
         }
 
@@ -579,8 +577,8 @@
 
             <div class="results" id="results">
                 <div class="results-header">
-                    <h2><i class="fas fa-chart-line"></i> Price Comparison Results</h2>
-                    <p>Prices compared across USD, EUR, GBP, CAD, and AUD</p>
+                    <h2><i class="fas fa-search"></i> Ready to Search</h2>
+                    <p>Enter your flight details above to compare prices across multiple currencies</p>
                 </div>
 
                 <div class="price-comparison" id="bestPrice" style="display: none;">
@@ -827,7 +825,7 @@
         // AI Insights functions
         async function fetchAIInsights(searchData) {
             try {
-                console.log('Making API request to /api/ai/recommendations:', searchData);
+                
                 const response = await fetch(`${API_BASE_URL}/api/ai/recommendations`, {
                     method: 'POST',
                     headers: {
@@ -838,13 +836,13 @@
 
                 if (response.ok) {
                     const insights = await response.json();
-                    console.log('AI insights response:', insights);
+                    
                     displayAIInsights(insights);
                 } else {
-                    console.log('AI insights request failed:', response.status, response.statusText);
+                    
                 }
             } catch (error) {
-                console.log('AI insights not available:', error);
+                
             }
         }
 
@@ -855,19 +853,19 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
 
             try {
-                console.log('Making API request to /api/ai/destination-insights/' + destination);
+                
                 const response = await fetch(`${API_BASE_URL}/api/ai/destination-insights/${destination}`);
                 const insights = await response.json();
-                console.log('Destination insights response:', insights);
+                
 
                 if (response.ok) {
                     displayDestinationInsights(insights, destination);
                 } else {
-                    console.log('Destination insights request failed:', response.status, response.statusText);
+                    
                     showError('Destination Insights', 'Unable to load destination information.');
                 }
             } catch (error) {
-                console.log('Destination insights error:', error);
+                
                 showError('Destination Insights', 'AI service temporarily unavailable.');
             } finally {
                 btn.disabled = false;
@@ -888,7 +886,7 @@
                     showError('Price Analysis', 'Please perform a flight search first.');
                     return;
                 }
-                console.log('Making API request to /api/ai/analyze-prices:', { prices: currentResults });
+                
                 const response = await fetch(`${API_BASE_URL}/api/ai/analyze-prices`, {
                     method: 'POST',
                     headers: {
@@ -898,16 +896,16 @@
                 });
 
                 const analysis = await response.json();
-                console.log('Price analysis response:', analysis);
+                
 
                 if (response.ok) {
                     displayPriceAnalysis(analysis);
                 } else {
-                    console.log('Price analysis request failed:', response.status, response.statusText);
+                    
                     showError('Price Analysis', 'Unable to analyze price trends.');
                 }
             } catch (error) {
-                console.log('Price analysis error:', error);
+                
                 showError('Price Analysis', 'AI analysis service temporarily unavailable.');
             } finally {
                 btn.disabled = false;
@@ -917,38 +915,39 @@
 
         function displayAIInsights(data) {
             try {
-                console.log('displayAIInsights called with data:', data);
+                
                 if (!data) {
                     console.warn('No AI insights data provided');
                     return;
                 }
 
                 const { recommendations, insights } = data;
-                console.log('recommendations:', recommendations, 'insights:', insights);
+                
                 if ((!recommendations || recommendations.length === 0) && !insights) {
-                    console.log('No AI insights to display');
+                    
                     return;
                 }
 
                 insightsContent.innerHTML = '';
 
                 // Add recommendations
-                console.log('Checking recommendations:', recommendations, 'isArray:', Array.isArray(recommendations), 'length:', recommendations ? recommendations.length : 'N/A');
+                
                 if (recommendations && Array.isArray(recommendations) && recommendations.length > 0) {
-                    console.log('Adding recommendations:', recommendations);
+                    
                     const recDiv = document.createElement('div');
                     recDiv.className = 'insight-item';
                     const recHtml = recommendations.map(rec => {
-                        console.log('Processing rec:', rec, typeof rec);
+                        
                         if (typeof rec === 'string') {
                             return `<li>${rec}</li>`;
-                        } else if (rec && typeof rec === 'object' && rec.category && rec.advice) {
-                            return `<li><strong>${rec.category}:</strong> ${rec.advice}</li>`;
+                        } else if (rec && typeof rec === 'object' && rec.type && rec.value) {
+                            const formattedType = rec.type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                            return `<li><strong>${formattedType}:</strong> ${rec.value}</li>`;
                         } else {
                             return `<li>${JSON.stringify(rec)}</li>`;
                         }
                     }).join('');
-                    console.log('recHtml:', recHtml);
+                    
                     recDiv.innerHTML = `
                         <h4><i class="fas fa-lightbulb"></i> Travel Recommendations</h4>
                         <ul>
@@ -970,7 +969,7 @@
                 }
 
                 aiInsights.style.display = 'block';
-                console.log('AI insights displayed successfully');
+                
             } catch (error) {
                 console.error('Error in displayAIInsights:', error, data);
             }
@@ -992,7 +991,7 @@
 
             try {
                 const searchData = JSON.parse(localStorage.getItem('lastSearchData') || '{}');
-                console.log('Making API request to /api/ai/recommendations for tips:', searchData);
+                
                 const response = await fetch(`${API_BASE_URL}/api/ai/recommendations`, {
                     method: 'POST',
                     headers: {
@@ -1002,7 +1001,7 @@
                 });
 
                 const tips = await response.json();
-                console.log('Travel tips response:', tips);
+                
 
                 if (response.ok) {
                     const tipsDiv = document.createElement('div');
@@ -1016,11 +1015,11 @@
                     insightsContent.appendChild(tipsDiv);
                     aiInsights.style.display = 'block';
                 } else {
-                    console.log('Travel tips request failed:', response.status, response.statusText);
+                    
                     showError('Tips Unavailable', 'AI travel tips are temporarily unavailable.');
                 }
             } catch (error) {
-                console.log('Travel tips error:', error);
+                
                 showError('Tips Error', 'Unable to load travel tips.');
             } finally {
                 btn.disabled = false;
@@ -1066,7 +1065,11 @@
         function showLoading() {
             loading.style.display = 'block';
             error.style.display = 'none';
-            results.style.display = 'none';
+            document.querySelector('.results-header h2').innerHTML = '<i class="fas fa-search"></i> Searching...';
+            document.querySelector('.results-header p').textContent = 'Comparing prices across multiple currencies';
+            bestPrice.style.display = 'none';
+            allResults.innerHTML = '';
+            aiInsights.style.display = 'none';
             searchBtn.disabled = true;
             searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
         }
@@ -1087,9 +1090,13 @@
             errorTitle.style.color = type === 'success' ? '#155724' : '#c33';
             errorMessage.style.color = type === 'success' ? '#155724' : '#c33';
             error.style.display = 'block';
-            results.style.display = 'none';
             if (type !== 'success') {
                 hideLoading();
+                document.querySelector('.results-header h2').innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + title;
+                document.querySelector('.results-header p').textContent = message;
+                bestPrice.style.display = 'none';
+                allResults.innerHTML = '';
+                aiInsights.style.display = 'none';
             }
         }
 
@@ -1101,10 +1108,10 @@
         // Show results
         function showResults(data, preferredCurrency) {
             try {
-                console.log('showResults called with data:', data);
-                console.log('preferredCurrency:', preferredCurrency);
+
+
                 if (!data || data.error) {
-                    console.log('Data has error or is null:', data?.error);
+
                     // Display the error in a dedicated section
                     const errorDiv = document.createElement('div');
                     errorDiv.className = 'ai-response';
@@ -1118,35 +1125,39 @@
                     return;
                 }
 
+                // Update header
+                document.querySelector('.results-header h2').innerHTML = '<i class="fas fa-chart-line"></i> Price Comparison Results';
+                document.querySelector('.results-header p').textContent = 'Prices compared across USD, EUR, GBP, CAD, and AUD';
+
                 // Show best price
                 const lowestPrice = data.lowest_price || 0;
                 const lowestCurrency = data.lowest_currency || 'USD';
-                console.log('lowestPrice:', lowestPrice, 'lowestCurrency:', lowestCurrency);
+                
                 bestPriceAmount.textContent = formatCurrency(lowestPrice, lowestCurrency);
                 bestPriceCurrency.textContent = `Best price in ${lowestCurrency}`;
                 bestPrice.style.display = 'block';
-                console.log('bestPrice displayed:', bestPriceAmount.textContent, bestPriceCurrency.textContent);
+                
 
                 // Sort results with preferred currency first
                 const allResultsData = data.all_results || [];
-                console.log('allResultsData:', allResultsData);
+                
                 const sortedResults = [...allResultsData].sort((a, b) => {
                     if (a.currency === preferredCurrency && b.currency !== preferredCurrency) return -1;
                     if (b.currency === preferredCurrency && a.currency !== preferredCurrency) return 1;
                     return (a.price_usd || 0) - (b.price_usd || 0); // Then by USD price
                 });
-                console.log('sortedResults:', sortedResults);
+                
 
                 // Show all results with detailed flight information
-                console.log('Creating result cards for', sortedResults.length, 'results');
+                
                 allResults.innerHTML = '';
                 sortedResults.forEach((result, index) => {
                     try {
-                        console.log('Processing result', index, result);
+                        
                         const isBest = result.currency === lowestCurrency &&
                                       Math.abs(result.price - lowestPrice) < 0.01;
                         const isPreferred = result.currency === preferredCurrency;
-                        console.log('isBest:', isBest, 'isPreferred:', isPreferred);
+                        
 
                         // Get parsed flight details
                         const parsedOffer = result.parsed_offer || {};
@@ -1156,11 +1167,11 @@
                         const baggage = parsedOffer.baggage || {};
                         const pricing = parsedOffer.pricing || {};
                         const booking = parsedOffer.booking_info || {};
-                        console.log('parsedOffer:', parsedOffer);
+                        
 
                         const card = document.createElement('div');
                         card.className = `result-card ${isBest ? 'best' : ''} ${isPreferred ? 'preferred' : ''}`;
-                        console.log('Card className:', card.className);
+                        
                         card.innerHTML = `
                             <div class="currency">${result.currency || 'N/A'} ${isPreferred ? '<i class="fas fa-heart" style="color: #e74c3c;"></i>' : ''}</div>
                             <div class="price">${formatCurrency(result.price || 0, result.currency || 'USD')}</div>
@@ -1210,18 +1221,37 @@
                             ${isBest ? '<div style="color: #667eea; font-weight: bold; margin-top: 10px;"><i class="fas fa-star"></i> Best Deal!</div>' : ''}
                             ${isPreferred ? '<div style="color: #e74c3c; font-weight: bold; margin-top: 5px;"><i class="fas fa-heart"></i> Your Preferred Currency</div>' : ''}
                         `;
-                        console.log('Appending card to allResults');
+                        
                         allResults.appendChild(card);
-                        console.log('Card appended successfully');
+                        
                     } catch (cardError) {
                         console.error('Error creating result card:', cardError, result);
                     }
                 });
 
-                results.style.display = 'block';
+                results.classList.remove('results-hidden');
                 error.style.display = 'none';
                 hideLoading();
-                console.log('UI updated successfully: results displayed');
+                
+                // Scroll to results to ensure visibility
+                results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Diagnostic logs for visibility issue
+                
+                
+                
+                
+                
+                if (allResults.children.length > 0) {
+                    const firstCard = allResults.children[0];
+                    
+                    
+                    
+                }
+                // Check parent containers
+                const searchSection = document.querySelector('.search-section');
+                
+                
+                
             } catch (error) {
                 console.error('Error in showResults:', error, data);
                 showError('Display Error', 'Unable to display search results. Please try again.');
@@ -1267,7 +1297,7 @@
             showLoading();
 
             try {
-                console.log('Making API request to /api/ai/parse-query:', { query });
+                
                 const response = await fetch(`${API_BASE_URL}/api/ai/parse-query`, {
                     method: 'POST',
                     headers: {
@@ -1277,7 +1307,7 @@
                 });
 
                 const parsedData = await response.json();
-                console.log('Parse query response:', parsedData);
+                
 
                 if (response.ok && parsedData.parsed && parsedData.origin && parsedData.destination) {
                     // Display the parsed data
@@ -1313,7 +1343,7 @@
                         searchForm.dispatchEvent(new Event('submit'));
                     }, 3000);
                 } else {
-                    console.log('Parse query request failed:', response.status, response.statusText, parsedData);
+                    
                     if (parsedData.message && (parsedData.message.includes('OpenAI API key') || parsedData.message.includes('insufficient_quota') || parsedData.message.includes('billing'))) {
                         showError('AI Features Limited', 'AI search requires a valid OpenAI API key with credits. Please use the regular search form below, or check your OpenAI account billing.');
                     } else {
@@ -1321,7 +1351,7 @@
                     }
                 }
             } catch (error) {
-                console.log('Parse query error:', error);
+                
                 showError('AI Search Failed', 'Unable to process your natural language query. Please use the form below instead.');
             }
         });
@@ -1393,13 +1423,13 @@
                     adults: passengers
                 });
                 const url = `${API_BASE_URL}/api/flights/search?${params}`;
-                console.log('Making API request to flight search:', url);
+                
                 const response = await fetch(url);
                 const data = await response.json();
-                console.log('Flight search response:', data);
+                
 
                 if (response.ok) {
-                    console.log('Flight search successful, calling showResults');
+                    
                     showResults(data, preferredCurrency);
 
                     // Store search results for AI analysis
@@ -1425,11 +1455,11 @@
                     showError('Search Complete!', `Found flight options from ${origin} to ${destination}. AI insights loading...`, 'success');
                     setTimeout(() => hideError(), 3000);
                 } else {
-                    console.log('Flight search request failed:', response.status, response.statusText, data);
+                    
                     showError('Search Failed', data.detail || 'An error occurred while searching for flights.');
                 }
             } catch (error) {
-                console.log('Flight search error:', error);
+                
                 showError('Connection Error', 'Unable to connect to the flight search service. Please try again later.');
             }
         });
