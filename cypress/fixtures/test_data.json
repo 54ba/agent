@@ -1,0 +1,41 @@
+{
+  "airports": [
+    { "code": "JFK", "name": "John F. Kennedy International Airport" },
+    { "code": "LAX", "name": "Los Angeles International Airport" },
+    { "code": "CDG", "name": "Charles de Gaulle Airport" },
+    { "code": "LHR", "name": "London Heathrow Airport" },
+    { "code": "FRA", "name": "Frankfurt Airport" },
+    { "code": "AMS", "name": "Amsterdam Schiphol Airport" },
+    { "code": "MAD", "name": "Madrid-Barajas Airport" },
+    { "code": "FCO", "name": "Leonardo da Vinci–Fiumicino Airport" },
+    { "code": "NRT", "name": "Narita International Airport" },
+    { "code": "ICN", "name": "Incheon International Airport" }
+  ],
+  "currencies": ["USD", "EUR", "GBP", "CAD", "AUD"],
+  "passenger_counts": [1, 2, 3, 4],
+  "search_queries": [
+    "Find cheap flights from New York to London next month",
+    "Book 2 tickets to Paris in June",
+    "Find flights to Tokyo under $800",
+    "I need to fly from JFK to CDG on June 15th for 2 adults",
+    "Looking for budget flights from Los Angeles to Frankfurt",
+    "Paris trip for 3 people in July",
+    "Tokyo vacation under 1000 dollars",
+    "Amsterdam business trip next week",
+    "Madrid holiday for 2 adults",
+    "Rome vacation in September"
+  ],
+  "invalid_airports": ["INVALID", "123", "ABCD", "NYC"],
+  "edge_case_dates": [
+    { "date": "2025-01-01", "description": "New Year's Day" },
+    { "date": "2025-07-04", "description": "Independence Day" },
+    { "date": "2025-12-25", "description": "Christmas Day" },
+    { "date": "2024-12-31", "description": "Past date" }
+  ],
+  "error_scenarios": [
+    { "status": 400, "message": "Invalid airport code" },
+    { "status": 404, "message": "No flights found" },
+    { "status": 500, "message": "Internal server error" },
+    { "status": 503, "message": "Service temporarily unavailable" }
+  ]
+}

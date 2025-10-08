@@ -1,0 +1,115 @@
+{
+  "success_response": {
+    "lowest_price": 450.00,
+    "lowest_currency": "EUR",
+    "all_results": [
+      {
+        "currency": "EUR",
+        "price": 450.00,
+        "price_usd": 495.00,
+        "parsed_offer": {
+          "flight_info": {
+            "airline": "Air France",
+            "flight_number": "AF123",
+            "duration": "8h 30m"
+          },
+          "departure": {
+            "time": "2025-06-15T10:00:00Z",
+            "airport": "JFK",
+            "terminal": "1"
+          },
+          "arrival": {
+            "time": "2025-06-15T22:30:00Z",
+            "airport": "CDG",
+            "terminal": "2E"
+          },
+          "baggage": {
+            "cabin_bags": { "quantity": 1 },
+            "checked_bags": { "quantity": 2 }
+          },
+          "pricing": {
+            "base_fare": 350.00,
+            "taxes": 100.00
+          },
+          "booking_info": {
+            "seats_available": 15
+          }
+        }
+      },
+      {
+        "currency": "USD",
+        "price": 500.00,
+        "price_usd": 500.00,
+        "parsed_offer": {
+          "flight_info": {
+            "airline": "Delta Airlines",
+            "flight_number": "DL456",
+            "duration": "8h 45m"
+          },
+          "departure": {
+            "time": "2025-06-15T14:00:00Z",
+            "airport": "JFK",
+            "terminal": "3"
+          },
+          "arrival": {
+            "time": "2025-06-16T02:45:00Z",
+            "airport": "CDG",
+            "terminal": "2F"
+          },
+          "baggage": {
+            "cabin_bags": { "quantity": 1 },
+            "checked_bags": { "quantity": 1 }
+          },
+          "pricing": {
+            "base_fare": 400.00,
+            "taxes": 100.00
+          },
+          "booking_info": {
+            "seats_available": 8
+          }
+        }
+      },
+      {
+        "currency": "GBP",
+        "price": 380.00,
+        "price_usd": 475.00,
+        "parsed_offer": {
+          "flight_info": {
+            "airline": "British Airways",
+            "flight_number": "BA789",
+            "duration": "7h 55m"
+          },
+          "departure": {
+            "time": "2025-06-15T18:00:00Z",
+            "airport": "JFK",
+            "terminal": "7"
+          },
+          "arrival": {
+            "time": "2025-06-16T05:55:00Z",
+            "airport": "CDG",
+            "terminal": "5"
+          },
+          "baggage": {
+            "cabin_bags": { "quantity": 1 },
+            "checked_bags": { "quantity": 0 }
+          },
+          "pricing": {
+            "base_fare": 300.00,
+            "taxes": 80.00
+          },
+          "booking_info": {
+            "seats_available": 3
+          }
+        }
+      }
+    ]
+  },
+  "error_response": {
+    "error": "No flights found for the selected route and date"
+  },
+  "empty_response": {
+    "lowest_price": 0,
+    "lowest_currency": "USD",
+    "all_results": []
+  }
+}

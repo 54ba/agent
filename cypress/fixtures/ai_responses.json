@@ -1,0 +1,70 @@
+{
+  "parse_query_success": {
+    "parsed": true,
+    "origin": "JFK",
+    "destination": "CDG",
+    "departure_date": "2025-06-15",
+    "passengers": 2,
+    "currency": "EUR",
+    "confidence_score": 0.95
+  },
+  "parse_query_low_confidence": {
+    "parsed": true,
+    "origin": "JFK",
+    "destination": "CDG",
+    "departure_date": "2025-06-15",
+    "passengers": 1,
+    "currency": "USD",
+    "confidence_score": 0.65
+  },
+  "parse_query_failure": {
+    "parsed": false,
+    "message": "Natural language processing requires Groq API key"
+  },
+  "ai_recommendations": {
+    "recommendations": [
+      "Consider booking 2-3 months in advance for best rates",
+      "Tuesday and Wednesday flights are usually cheaper",
+      "Consider nearby airports for better deals",
+      "Check for flexible booking options to avoid change fees"
+    ],
+    "insights": "Current market trends show stable pricing with potential for slight increases during peak summer season. EUR offers better value compared to USD for transatlantic flights."
+  },
+  "destination_insights": {
+    "best_time_to_visit": "September to November for mild weather and fewer crowds",
+    "attractions": [
+      "Eiffel Tower and surrounding parks",
+      "Louvre Museum and art galleries",
+      "Seine River cruises",
+      "Montmartre and Sacré-Cœur Basilica",
+      "Palace of Versailles day trip"
+    ],
+    "travel_tips": [
+      "Use Paris Visite pass for unlimited public transport",
+      "Book museum tickets online to skip long lines",
+      "Learn basic French phrases for better interactions",
+      "Carry euros in small denominations for markets and cafes"
+    ],
+    "transportation": [
+      "Paris Metro and RER trains",
+      "Velib' bike-sharing system",
+      "Uber or Bolt ride-sharing",
+      "Airport shuttles from CDG and Orly"
+    ]
+  },
+  "price_analysis": {
+    "best_value_currency": "EUR",
+    "trend_analysis": "EUR currently offers 8-12% better value for European destinations. Exchange rate fluctuations expected to stabilize within 2 weeks.",
+    "booking_recommendation": "Book within the next 7-10 days to secure current rates. Prices may increase by 5-8% closer to departure date."
+  },
+  "travel_tips": {
+    "recommendations": [
+      "Pack comfortable walking shoes for extensive city exploration",
+      "Download offline maps and translation apps",
+      "Keep important documents in a separate pouch",
+      "Check airline baggage policies carefully",
+      "Have travel insurance that covers trip cancellations"
+    ],
+    "insights": "Traveling during your selected dates may have increased security lines at airports. Allow extra time for check-in and security procedures."
+  }
+}

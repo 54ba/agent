@@ -8,6 +8,13 @@ class AIService:
         self.api_key = settings.GROQ_API_KEY
         self.client = AsyncGroq(api_key=self.api_key) if self.api_key else None
 
+    def _validate_json_response(self, content: str) -> bool:
+        """Validate if the response content is valid JSON format"""
+        if not content or not content.strip():
+            return False
+        content = content.strip()
+        return content.startswith(('{', '['))
+
     async def get_travel_recommendations(self, search_data: Dict) -> Dict:
         """Get AI-powered travel recommendations based on search"""
         if not self.api_key:
@@ -22,6 +29,7 @@ class AIService:
             2. Alternative destinations similar to the searched one
             3. Travel tips and cost-saving advice
 
+            Respond ONLY with valid JSON. Do not include any explanatory text, conversational responses, or markdown formatting. Start your response with {{ and end with }}.
             Format as JSON with keys: recommendations (array), insights (string)
             """
 
@@ -33,6 +41,11 @@ class AIService:
             )
 
             content = completion.choices[0].message.content
+            if not self._validate_json_response(content):
+                return {
+                    "recommendations": ["Check local events and festivals", "Consider nearby destinations", "Look for flexible booking options"],
+                    "insights": "AI recommendations unavailable: Invalid response format"
+                }
             return json.loads(content)
 
         except Exception as e:
@@ -58,6 +71,7 @@ class AIService:
             2. Price trend insights
             3. Recommendations for booking
 
+            Respond ONLY with valid JSON. Do not include any explanatory text, conversational responses, or markdown formatting. Start your response with {{ and end with }}.
             Format as JSON with keys: best_value_currency, trend_analysis, booking_recommendation
             """
 
@@ -69,6 +83,12 @@ class AIService:
             )
 
             content = completion.choices[0].message.content
+            if not self._validate_json_response(content):
+                return {
+                    "best_value_currency": prices[0]['currency'] if prices else "Unknown",
+                    "trend_analysis": "Price analysis temporarily unavailable: Invalid response format",
+                    "booking_recommendation": "Consider booking soon if prices are favorable"
+                }
             return json.loads(content)
 
         except Exception as e:
@@ -91,6 +111,7 @@ class AIService:
             3. Travel tips
             4. Local transportation options
 
+            Respond ONLY with valid JSON. Do not include any explanatory text, conversational responses, or markdown formatting. Start your response with {{ and end with }}.
             Format as JSON with keys: best_time_to_visit, attractions, travel_tips, transportation
             """
 
@@ -102,6 +123,13 @@ class AIService:
             )
 
             content = completion.choices[0].message.content
+            if not self._validate_json_response(content):
+                return {
+                    "best_time_to_visit": "Check local weather and events",
+                    "attractions": ["Local sightseeing", "Cultural experiences"],
+                    "travel_tips": ["Research visa requirements", "Check local customs"],
+                    "transportation": ["Airport taxis", "Public transport", "Ride-sharing services"]
+                }
             return json.loads(content)
 
         except Exception as e:
@@ -129,6 +157,7 @@ class AIService:
             - Preferred currency (if mentioned)
             - Any special requirements
 
+            Respond ONLY with valid JSON. Do not include any explanatory text, conversational responses, or markdown formatting. Start your response with {{ and end with }}.
             Format as JSON with keys: origin, destination, departure_date, passengers, currency, requirements, confidence_score
             If information is not available, use null values.
             """
@@ -141,6 +170,12 @@ class AIService:
             )
 
             content = completion.choices[0].message.content
+            if not self._validate_json_response(content):
+                return {
+                    "parsed": False,
+                    "message": "Invalid JSON response from AI",
+                    "confidence_score": 0
+                }
             result = json.loads(content)
 
             # Validate airport codes if they look like codes

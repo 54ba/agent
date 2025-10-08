@@ -102,8 +102,8 @@ class FlightService:
             # Fallback to basic info if parsing fails
             return {
                 "flight_info": {"airline": "Unknown", "flight_number": "Unknown"},
-                "departure": {"airport": origin, "time": "Unknown"},
-                "arrival": {"airport": destination, "time": "Unknown"},
+                "departure": {"airport": None, "time": None},
+                "arrival": {"airport": None, "time": None},
                 "pricing": {"total": float(offer.get("price", {}).get("total", 0))},
                 "error": f"Parsing failed: {str(e)}"
             }
