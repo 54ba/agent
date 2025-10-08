@@ -7,7 +7,7 @@ import datetime
 flight_service = FlightService()
 ai_service = AIService()
 
-def handler(event, context):
+async def handler(event, context):
     """Main Netlify Function handler"""
     try:
         # Get the path and method
@@ -35,16 +35,16 @@ def handler(event, context):
 
         # Route to appropriate handler
         if path == '/flights/search' and http_method == 'GET':
-            return asyncio.run(handle_flight_search(query_params))
+            return await handle_flight_search(query_params)
         elif path == '/ai/recommendations' and http_method == 'POST':
-            return asyncio.run(handle_recommendations(body))
+            return await handle_recommendations(body)
         elif path == '/ai/analyze-prices' and http_method == 'POST':
-            return asyncio.run(handle_price_analysis(body))
+            return await handle_price_analysis(body)
         elif path.startswith('/ai/destination-insights/') and http_method == 'GET':
             destination = path.replace('/ai/destination-insights/', '')
-            return asyncio.run(handle_destination_insights(destination))
+            return await handle_destination_insights(destination)
         elif path == '/ai/parse-query' and http_method == 'POST':
-            return asyncio.run(handle_parse_query(body))
+            return await handle_parse_query(body)
         else:
             return {
                 'statusCode': 404,
