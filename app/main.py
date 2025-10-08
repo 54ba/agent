@@ -21,8 +21,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Include routers
 app.include_router(flight_router, prefix="/api/flights", tags=["flights"])
