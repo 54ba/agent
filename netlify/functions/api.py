@@ -1,7 +1,7 @@
 import json
 import os
-from app.services.flight_service import FlightService
-from app.services.ai_service import AIService
+from flight_service import FlightService
+from ai_service import AIService
 
 # Initialize services
 flight_service = FlightService()
