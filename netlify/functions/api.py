@@ -34,16 +34,16 @@ def handler(event, context):
                 }
 
         # Route to appropriate handler
-        if path == '/search' and http_method == 'GET':
+        if path == '/flights/search' and http_method == 'GET':
             return asyncio.run(handle_flight_search(query_params))
-        elif path == '/recommendations' and http_method == 'POST':
+        elif path == '/ai/recommendations' and http_method == 'POST':
             return asyncio.run(handle_recommendations(body))
-        elif path == '/analyze-prices' and http_method == 'POST':
+        elif path == '/ai/analyze-prices' and http_method == 'POST':
             return asyncio.run(handle_price_analysis(body))
-        elif path.startswith('/destination-insights/') and http_method == 'GET':
-            destination = path.replace('/destination-insights/', '')
+        elif path.startswith('/ai/destination-insights/') and http_method == 'GET':
+            destination = path.replace('/ai/destination-insights/', '')
             return asyncio.run(handle_destination_insights(destination))
-        elif path == '/parse-query' and http_method == 'POST':
+        elif path == '/ai/parse-query' and http_method == 'POST':
             return asyncio.run(handle_parse_query(body))
         else:
             return {
