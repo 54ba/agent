@@ -632,9 +632,12 @@
 
         // Load configuration on page load
         async function loadConfig() {
-            // Use relative URLs for both localhost and production
-            // Netlify _redirects handles routing to functions
-            API_BASE_URL = '';
+            // Automatically detect localhost for local testing, use relative URLs for production
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                API_BASE_URL = 'http://localhost:8000';
+            } else {
+                API_BASE_URL = '';
+            }
         }
 
         const searchForm = document.getElementById('searchForm');
@@ -806,7 +809,8 @@
             history.forEach(item => {
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-item';
-                historyItem.textContent = `${item.origin} → ${item.destination}`;
+                const date = new Date(item.timestamp).toLocaleDateString();
+                historyItem.innerHTML = `<strong>${item.origin} → ${item.destination}</strong><br><small style="color: #666;">${date} • ${item.passengers} passenger${item.passengers > 1 ? 's' : ''}</small>`;
                 historyItem.onclick = () => loadSearch(item);
                 historyList.appendChild(historyItem);
             });
@@ -912,38 +916,64 @@
         }
 
         function displayAIInsights(data) {
-            const { recommendations, insights } = data;
-            if (!recommendations || recommendations.length === 0) {
-                return;
+            try {
+                console.log('displayAIInsights called with data:', data);
+                if (!data) {
+                    console.warn('No AI insights data provided');
+                    return;
+                }
+
+                const { recommendations, insights } = data;
+                console.log('recommendations:', recommendations, 'insights:', insights);
+                if ((!recommendations || recommendations.length === 0) && !insights) {
+                    console.log('No AI insights to display');
+                    return;
+                }
+
+                insightsContent.innerHTML = '';
+
+                // Add recommendations
+                console.log('Checking recommendations:', recommendations, 'isArray:', Array.isArray(recommendations), 'length:', recommendations ? recommendations.length : 'N/A');
+                if (recommendations && Array.isArray(recommendations) && recommendations.length > 0) {
+                    console.log('Adding recommendations:', recommendations);
+                    const recDiv = document.createElement('div');
+                    recDiv.className = 'insight-item';
+                    const recHtml = recommendations.map(rec => {
+                        console.log('Processing rec:', rec, typeof rec);
+                        if (typeof rec === 'string') {
+                            return `<li>${rec}</li>`;
+                        } else if (rec && typeof rec === 'object' && rec.category && rec.advice) {
+                            return `<li><strong>${rec.category}:</strong> ${rec.advice}</li>`;
+                        } else {
+                            return `<li>${JSON.stringify(rec)}</li>`;
+                        }
+                    }).join('');
+                    console.log('recHtml:', recHtml);
+                    recDiv.innerHTML = `
+                        <h4><i class="fas fa-lightbulb"></i> Travel Recommendations</h4>
+                        <ul>
+                            ${recHtml}
+                        </ul>
+                    `;
+                    insightsContent.appendChild(recDiv);
+                }
+
+                // Add insights
+                if (insights && typeof insights === 'string' && insights.trim()) {
+                    const insightDiv = document.createElement('div');
+                    insightDiv.className = 'insight-item';
+                    insightDiv.innerHTML = `
+                        <h4><i class="fas fa-info-circle"></i> Travel Insights</h4>
+                        <p>${insights}</p>
+                    `;
+                    insightsContent.appendChild(insightDiv);
+                }
+
+                aiInsights.style.display = 'block';
+                console.log('AI insights displayed successfully');
+            } catch (error) {
+                console.error('Error in displayAIInsights:', error, data);
             }
-
-            insightsContent.innerHTML = '';
-
-            // Add recommendations
-            if (recommendations && recommendations.length > 0) {
-                const recDiv = document.createElement('div');
-                recDiv.className = 'insight-item';
-                recDiv.innerHTML = `
-                    <h4><i class="fas fa-lightbulb"></i> Travel Recommendations</h4>
-                    <ul>
-                        ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
-                    </ul>
-                `;
-                insightsContent.appendChild(recDiv);
-            }
-
-            // Add insights
-            if (insights) {
-                const insightDiv = document.createElement('div');
-                insightDiv.className = 'insight-item';
-                insightDiv.innerHTML = `
-                    <h4><i class="fas fa-info-circle"></i> Travel Insights</h4>
-                    <p>${insights}</p>
-                `;
-                insightsContent.appendChild(insightDiv);
-            }
-
-            aiInsights.style.display = 'block';
         }
 
         function displayDestinationInsights(insights, destination) {
@@ -1070,105 +1100,132 @@
 
         // Show results
         function showResults(data, preferredCurrency) {
-            if (data.error) {
-                // Display the error in a dedicated section
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'ai-response';
-                errorDiv.innerHTML = `
-                    <h4><i class="fas fa-exclamation-triangle"></i> Flight Search Result</h4>
-                    <p style="color: #dc3545; font-weight: 600;">${data.error}</p>
-                `;
-                document.querySelector('.search-section').insertBefore(errorDiv, document.getElementById('results'));
+            try {
+                console.log('showResults called with data:', data);
+                console.log('preferredCurrency:', preferredCurrency);
+                if (!data || data.error) {
+                    console.log('Data has error or is null:', data?.error);
+                    // Display the error in a dedicated section
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'ai-response';
+                    errorDiv.innerHTML = `
+                        <h4><i class="fas fa-exclamation-triangle"></i> Flight Search Result</h4>
+                        <p style="color: #dc3545; font-weight: 600;">${data?.error || 'Unknown error'}</p>
+                    `;
+                    document.querySelector('.search-section').insertBefore(errorDiv, document.getElementById('results'));
 
-                showError('No Flights Found', 'Unable to find flight offers for your search. Please check your airport codes and try different dates.');
-                return;
+                    showError('No Flights Found', 'Unable to find flight offers for your search. Please check your airport codes and try different dates.');
+                    return;
+                }
+
+                // Show best price
+                const lowestPrice = data.lowest_price || 0;
+                const lowestCurrency = data.lowest_currency || 'USD';
+                console.log('lowestPrice:', lowestPrice, 'lowestCurrency:', lowestCurrency);
+                bestPriceAmount.textContent = formatCurrency(lowestPrice, lowestCurrency);
+                bestPriceCurrency.textContent = `Best price in ${lowestCurrency}`;
+                bestPrice.style.display = 'block';
+                console.log('bestPrice displayed:', bestPriceAmount.textContent, bestPriceCurrency.textContent);
+
+                // Sort results with preferred currency first
+                const allResultsData = data.all_results || [];
+                console.log('allResultsData:', allResultsData);
+                const sortedResults = [...allResultsData].sort((a, b) => {
+                    if (a.currency === preferredCurrency && b.currency !== preferredCurrency) return -1;
+                    if (b.currency === preferredCurrency && a.currency !== preferredCurrency) return 1;
+                    return (a.price_usd || 0) - (b.price_usd || 0); // Then by USD price
+                });
+                console.log('sortedResults:', sortedResults);
+
+                // Show all results with detailed flight information
+                console.log('Creating result cards for', sortedResults.length, 'results');
+                allResults.innerHTML = '';
+                sortedResults.forEach((result, index) => {
+                    try {
+                        console.log('Processing result', index, result);
+                        const isBest = result.currency === lowestCurrency &&
+                                      Math.abs(result.price - lowestPrice) < 0.01;
+                        const isPreferred = result.currency === preferredCurrency;
+                        console.log('isBest:', isBest, 'isPreferred:', isPreferred);
+
+                        // Get parsed flight details
+                        const parsedOffer = result.parsed_offer || {};
+                        const flightInfo = parsedOffer.flight_info || {};
+                        const departure = parsedOffer.departure || {};
+                        const arrival = parsedOffer.arrival || {};
+                        const baggage = parsedOffer.baggage || {};
+                        const pricing = parsedOffer.pricing || {};
+                        const booking = parsedOffer.booking_info || {};
+                        console.log('parsedOffer:', parsedOffer);
+
+                        const card = document.createElement('div');
+                        card.className = `result-card ${isBest ? 'best' : ''} ${isPreferred ? 'preferred' : ''}`;
+                        console.log('Card className:', card.className);
+                        card.innerHTML = `
+                            <div class="currency">${result.currency || 'N/A'} ${isPreferred ? '<i class="fas fa-heart" style="color: #e74c3c;"></i>' : ''}</div>
+                            <div class="price">${formatCurrency(result.price || 0, result.currency || 'USD')}</div>
+                            <div class="usd-equivalent">≈ ${formatCurrency(result.price_usd || 0, 'USD')} USD</div>
+
+                            ${flightInfo.airline ? `
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                        <div style="font-weight: bold; color: #333;">
+                                            <i class="fas fa-plane"></i> ${flightInfo.airline} ${flightInfo.flight_number || ''}
+                                        </div>
+                                        <div style="font-size: 0.9em; color: #666;">
+                                            ${flightInfo.duration || 'Duration N/A'}
+                                        </div>
+                                    </div>
+
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                        <div>
+                                            <div style="font-weight: bold;">${departure.time ? new Date(departure.time).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) : 'Time N/A'}</div>
+                                            <div style="font-size: 0.9em; color: #666;">${departure.airport || 'DEP'} ${departure.terminal ? `(Terminal ${departure.terminal})` : ''}</div>
+                                        </div>
+                                        <div style="flex: 1; text-align: center; color: #999;">
+                                            <i class="fas fa-arrow-right"></i>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-weight: bold;">${arrival.time ? new Date(arrival.time).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) : 'Time N/A'}</div>
+                                            <div style="font-size: 0.9em; color: #666;">${arrival.airport || 'ARR'} ${arrival.terminal ? `(Terminal ${arrival.terminal})` : ''}</div>
+                                        </div>
+                                    </div>
+
+                                    ${baggage.cabin_bags || baggage.checked_bags ? `
+                                        <div style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
+                                            <i class="fas fa-suitcase"></i>
+                                            ${baggage.cabin_bags && baggage.cabin_bags.quantity > 0 ? `Cabin: ${baggage.cabin_bags.quantity}` : ''}
+                                            ${baggage.checked_bags && baggage.checked_bags.quantity > 0 ? ` | Checked: ${baggage.checked_bags.quantity}` : ''}
+                                        </div>
+                                    ` : ''}
+
+                                    ${booking.seats_available ? `
+                                        <div style="font-size: 0.9em; color: #28a745;">
+                                            <i class="fas fa-chair"></i> ${booking.seats_available} seats available
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+
+                            ${isBest ? '<div style="color: #667eea; font-weight: bold; margin-top: 10px;"><i class="fas fa-star"></i> Best Deal!</div>' : ''}
+                            ${isPreferred ? '<div style="color: #e74c3c; font-weight: bold; margin-top: 5px;"><i class="fas fa-heart"></i> Your Preferred Currency</div>' : ''}
+                        `;
+                        console.log('Appending card to allResults');
+                        allResults.appendChild(card);
+                        console.log('Card appended successfully');
+                    } catch (cardError) {
+                        console.error('Error creating result card:', cardError, result);
+                    }
+                });
+
+                results.style.display = 'block';
+                error.style.display = 'none';
+                hideLoading();
+                console.log('UI updated successfully: results displayed');
+            } catch (error) {
+                console.error('Error in showResults:', error, data);
+                showError('Display Error', 'Unable to display search results. Please try again.');
             }
-
-            // Show best price
-            bestPriceAmount.textContent = formatCurrency(data.lowest_price, data.lowest_currency);
-            bestPriceCurrency.textContent = `Best price in ${data.lowest_currency}`;
-            bestPrice.style.display = 'block';
-
-            // Sort results with preferred currency first
-            const sortedResults = [...data.all_results].sort((a, b) => {
-                if (a.currency === preferredCurrency && b.currency !== preferredCurrency) return -1;
-                if (b.currency === preferredCurrency && a.currency !== preferredCurrency) return 1;
-                return a.price_usd - b.price_usd; // Then by USD price
-            });
-
-            // Show all results with detailed flight information
-            allResults.innerHTML = '';
-            sortedResults.forEach(result => {
-                const isBest = result.currency === data.lowest_currency &&
-                              Math.abs(result.price - data.lowest_price) < 0.01;
-                const isPreferred = result.currency === preferredCurrency;
-
-                // Get parsed flight details
-                const parsedOffer = result.parsed_offer || {};
-                const flightInfo = parsedOffer.flight_info || {};
-                const departure = parsedOffer.departure || {};
-                const arrival = parsedOffer.arrival || {};
-                const baggage = parsedOffer.baggage || {};
-                const pricing = parsedOffer.pricing || {};
-                const booking = parsedOffer.booking_info || {};
-
-                const card = document.createElement('div');
-                card.className = `result-card ${isBest ? 'best' : ''} ${isPreferred ? 'preferred' : ''}`;
-                card.innerHTML = `
-                    <div class="currency">${result.currency} ${isPreferred ? '<i class="fas fa-heart" style="color: #e74c3c;"></i>' : ''}</div>
-                    <div class="price">${formatCurrency(result.price, result.currency)}</div>
-                    <div class="usd-equivalent">≈ ${formatCurrency(result.price_usd, 'USD')} USD</div>
-
-                    ${flightInfo.airline ? `
-                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <div style="font-weight: bold; color: #333;">
-                                    <i class="fas fa-plane"></i> ${flightInfo.airline} ${flightInfo.flight_number || ''}
-                                </div>
-                                <div style="font-size: 0.9em; color: #666;">
-                                    ${flightInfo.duration || 'Duration N/A'}
-                                </div>
-                            </div>
-
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <div>
-                                    <div style="font-weight: bold;">${departure.time ? new Date(departure.time).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) : 'Time N/A'}</div>
-                                    <div style="font-size: 0.9em; color: #666;">${departure.airport || 'DEP'} ${departure.terminal ? `(Terminal ${departure.terminal})` : ''}</div>
-                                </div>
-                                <div style="flex: 1; text-align: center; color: #999;">
-                                    <i class="fas fa-arrow-right"></i>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="font-weight: bold;">${arrival.time ? new Date(arrival.time).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) : 'Time N/A'}</div>
-                                    <div style="font-size: 0.9em; color: #666;">${arrival.airport || 'ARR'} ${arrival.terminal ? `(Terminal ${arrival.terminal})` : ''}</div>
-                                </div>
-                            </div>
-
-                            ${baggage.cabin_bags || baggage.checked_bags ? `
-                                <div style="font-size: 0.9em; color: #666; margin-bottom: 10px;">
-                                    <i class="fas fa-suitcase"></i>
-                                    ${baggage.cabin_bags && baggage.cabin_bags.quantity > 0 ? `Cabin: ${baggage.cabin_bags.quantity}` : ''}
-                                    ${baggage.checked_bags && baggage.checked_bags.quantity > 0 ? ` | Checked: ${baggage.checked_bags.quantity}` : ''}
-                                </div>
-                            ` : ''}
-
-                            ${booking.seats_available ? `
-                                <div style="font-size: 0.9em; color: #28a745;">
-                                    <i class="fas fa-chair"></i> ${booking.seats_available} seats available
-                                </div>
-                            ` : ''}
-                        </div>
-                    ` : ''}
-
-                    ${isBest ? '<div style="color: #667eea; font-weight: bold; margin-top: 10px;"><i class="fas fa-star"></i> Best Deal!</div>' : ''}
-                    ${isPreferred ? '<div style="color: #e74c3c; font-weight: bold; margin-top: 5px;"><i class="fas fa-heart"></i> Your Preferred Currency</div>' : ''}
-                `;
-                allResults.appendChild(card);
-            });
-
-            results.style.display = 'block';
-            error.style.display = 'none';
-            hideLoading();
         }
 
         // Input validation
@@ -1342,6 +1399,7 @@
                 console.log('Flight search response:', data);
 
                 if (response.ok) {
+                    console.log('Flight search successful, calling showResults');
                     showResults(data, preferredCurrency);
 
                     // Store search results for AI analysis
