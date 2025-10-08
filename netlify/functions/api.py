@@ -12,12 +12,10 @@ async def handler(event, context):
     print(f"Handler called with path: {event.get('path', '')}, method: {event.get('httpMethod', 'GET')}")
     try:
         # Get the path and method
-        path = event.get('path', '')
         http_method = event.get('httpMethod', 'GET')
 
-        # Remove /api prefix if present
-        if path.startswith('/api'):
-            path = path[4:] or '/'
+        # Get path from query params (set by redirect)
+        path = query_params.get('path', '/')
 
         # Parse query parameters
         query_params = event.get('queryStringParameters') or {}
