@@ -632,22 +632,9 @@
 
         // Load configuration on page load
         async function loadConfig() {
-            // For localhost, use relative URLs directly
-            if (window.location.hostname === 'localhost') {
-                API_BASE_URL = '';
-                return;
-            }
-
-            // For production, try to load config from server
-            try {
-                const response = await fetch('/api/config');
-                const config = await response.json();
-                API_BASE_URL = config.api_base_url || 'http://localhost:8000';
-            } catch (error) {
-                // Fallback for production
-                API_BASE_URL = 'http://localhost:8000';
-                console.log('Config load failed, using fallback:', API_BASE_URL);
-            }
+            // Use relative URLs for both localhost and production
+            // Netlify _redirects handles routing to functions
+            API_BASE_URL = '';
         }
 
         const searchForm = document.getElementById('searchForm');
@@ -913,33 +900,34 @@
             }
         }
 
-        function displayAIInsights(insights) {
-            if (!insights.recommendations || insights.recommendations.length === 0) {
+        function displayAIInsights(data) {
+            const { recommendations, insights } = data;
+            if (!recommendations || recommendations.length === 0) {
                 return;
             }
 
             insightsContent.innerHTML = '';
 
             // Add recommendations
-            if (insights.recommendations && insights.recommendations.length > 0) {
+            if (recommendations && recommendations.length > 0) {
                 const recDiv = document.createElement('div');
                 recDiv.className = 'insight-item';
                 recDiv.innerHTML = `
                     <h4><i class="fas fa-lightbulb"></i> Travel Recommendations</h4>
                     <ul>
-                        ${insights.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        ${recommendations.map(rec => `<li>${rec}</li>`).join('')}
                     </ul>
                 `;
                 insightsContent.appendChild(recDiv);
             }
 
             // Add insights
-            if (insights.insights) {
+            if (insights) {
                 const insightDiv = document.createElement('div');
                 insightDiv.className = 'insight-item';
                 insightDiv.innerHTML = `
                     <h4><i class="fas fa-info-circle"></i> Travel Insights</h4>
-                    <p>${insights.insights}</p>
+                    <p>${insights}</p>
                 `;
                 insightsContent.appendChild(insightDiv);
             }

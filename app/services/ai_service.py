@@ -2,6 +2,7 @@ from groq import AsyncGroq
 from typing import Dict, List, Optional
 from app.core.config import settings
 import json
+from datetime import datetime, timedelta
 
 class AIService:
     def __init__(self):
@@ -146,20 +147,24 @@ class AIService:
             return {"parsed": False, "message": "Natural language processing requires Groq API key"}
 
         try:
+            default_departure_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
             prompt = f"""
             Parse this natural language flight search query: "{query}"
 
+            Convert city names to IATA airport codes (e.g., "New York" to "NYC", "Paris" to "PAR").
+
             Extract:
-            - Origin airport/city
-            - Destination airport/city
-            - Departure date (if mentioned)
-            - Number of passengers (if mentioned)
-            - Preferred currency (if mentioned)
+            - Origin airport/city (as IATA code)
+            - Destination airport/city (as IATA code)
+            - Departure date (if mentioned, otherwise use {default_departure_date})
+            - Number of passengers (if mentioned, otherwise default to 1)
+            - Preferred currency (if mentioned, otherwise default to "USD")
             - Any special requirements
 
             Respond ONLY with valid JSON. Do not include any explanatory text, conversational responses, or markdown formatting. Start your response with {{ and end with }}.
-            Format as JSON with keys: origin, destination, departure_date, passengers, currency, requirements, confidence_score
-            If information is not available, use null values.
+            Format as JSON with keys: origin, destination, departure_date, passengers, currency, requirements, confidence_score, parsed
+            Set parsed to true for successful parsing.
+            Use default values as specified for missing fields.
             """
 
             completion = await self.client.chat.completions.create(
@@ -177,12 +182,6 @@ class AIService:
                     "confidence_score": 0
                 }
             result = json.loads(content)
-
-            # Validate airport codes if they look like codes
-            if result.get('origin') and len(result['origin']) == 3 and result['origin'].isupper():
-                result['origin_type'] = 'airport_code'
-            if result.get('destination') and len(result['destination']) == 3 and result['destination'].isupper():
-                result['destination_type'] = 'airport_code'
 
             return result
 
