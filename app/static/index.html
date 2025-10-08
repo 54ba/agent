@@ -571,6 +571,12 @@
                 <p id="errorMessage">Please try again later</p>
             </div>
 
+            <!-- AI Parsed Query Display -->
+            <div class="ai-parsed" id="aiParsed" style="display: none; background: rgba(255,255,255,0.95); border-radius: 10px; padding: 20px; margin: 20px 40px; border-left: 4px solid #667eea;">
+                <h3 style="color: #333; margin-bottom: 15px;"><i class="fas fa-brain"></i> AI Parsed Your Request</h3>
+                <div id="parsedContent" style="display: grid; gap: 10px;"></div>
+            </div>
+
             <div class="results" id="results">
                 <div class="results-header">
                     <h2><i class="fas fa-chart-line"></i> Price Comparison Results</h2>
@@ -658,6 +664,8 @@
         const historyList = document.getElementById('historyList');
         const aiInsights = document.getElementById('aiInsights');
         const insightsContent = document.getElementById('insightsContent');
+        const aiParsed = document.getElementById('aiParsed');
+        const parsedContent = document.getElementById('parsedContent');
 
         // Airport code validation
         function validateAirportCode(code) {
@@ -667,6 +675,50 @@
         // Fill example queries
         function fillExampleQuery(query) {
             document.getElementById('naturalLanguageQuery').value = query;
+        }
+
+        // Display AI parsed query
+        function displayAIParsed(parsedData) {
+            parsedContent.innerHTML = '';
+
+            const fields = [
+                { key: 'origin', label: 'From', icon: 'fas fa-plane-departure' },
+                { key: 'destination', label: 'To', icon: 'fas fa-plane-arrival' },
+                { key: 'departure_date', label: 'Departure Date', icon: 'fas fa-calendar-alt' },
+                { key: 'passengers', label: 'Passengers', icon: 'fas fa-users' },
+                { key: 'currency', label: 'Currency', icon: 'fas fa-dollar-sign' },
+                { key: 'requirements', label: 'Requirements', icon: 'fas fa-list' }
+            ];
+
+            fields.forEach(field => {
+                const value = parsedData[field.key];
+                if (value !== null && value !== undefined && value !== '') {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #eee;';
+                    div.innerHTML = `
+                        <i class="${field.icon}" style="color: #667eea; width: 20px;"></i>
+                        <span style="font-weight: 600; color: #333; min-width: 120px;">${field.label}:</span>
+                        <span style="color: #666;">${value}</span>
+                    `;
+                    parsedContent.appendChild(div);
+                }
+            });
+
+            if (parsedData.confidence_score !== undefined) {
+                const confidence = parsedData.confidence_score;
+                const confidenceClass = confidence > 0.8 ? 'confidence-high' : confidence > 0.6 ? 'confidence-medium' : 'confidence-low';
+                const confidenceText = confidence > 0.8 ? 'High' : confidence > 0.6 ? 'Medium' : 'Low';
+
+                const confidenceDiv = document.createElement('div');
+                confidenceDiv.style.cssText = 'margin-top: 15px; text-align: center;';
+                confidenceDiv.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 5px;">AI Confidence:</div>
+                    <span class="confidence-indicator ${confidenceClass}">${confidenceText} (${Math.round(confidence * 100)}%)</span>
+                `;
+                parsedContent.appendChild(confidenceDiv);
+            }
+
+            aiParsed.style.display = 'block';
         }
 
         // Show search suggestions
@@ -1016,6 +1068,15 @@
         // Show results
         function showResults(data, preferredCurrency) {
             if (data.error) {
+                // Display the error in a dedicated section
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'ai-response';
+                errorDiv.innerHTML = `
+                    <h4><i class="fas fa-exclamation-triangle"></i> Flight Search Result</h4>
+                    <p style="color: #dc3545; font-weight: 600;">${data.error}</p>
+                `;
+                document.querySelector('.search-section').insertBefore(errorDiv, document.getElementById('results'));
+
                 showError('No Flights Found', 'Unable to find flight offers for your search. Please check your airport codes and try different dates.');
                 return;
             }
@@ -1157,10 +1218,22 @@
                 const parsedData = await response.json();
 
                 if (response.ok && parsedData.parsed && parsedData.origin && parsedData.destination) {
+                    // Display the parsed data
+                    displayAIParsed(parsedData);
+
                     // Fill the form with parsed data
                     if (parsedData.origin) document.getElementById('origin').value = parsedData.origin.toUpperCase();
                     if (parsedData.destination) document.getElementById('destination').value = parsedData.destination.toUpperCase();
-                    if (parsedData.departure_date) document.getElementById('departureDate').value = parsedData.departure_date;
+                    if (parsedData.departure_date) {
+                        // Convert MM/DD/YYYY to YYYY-MM-DD
+                        const dateParts = parsedData.departure_date.split('/');
+                        if (dateParts.length === 3) {
+                            const formattedDate = `${dateParts[2]}-${dateParts[0].padStart(2, '0')}-${dateParts[1].padStart(2, '0')}`;
+                            document.getElementById('departureDate').value = formattedDate;
+                        } else {
+                            document.getElementById('departureDate').value = parsedData.departure_date;
+                        }
+                    }
                     if (parsedData.passengers) document.getElementById('passengers').value = parsedData.passengers;
                     if (parsedData.currency) document.getElementById('preferredCurrency').value = parsedData.currency;
 
